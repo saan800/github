@@ -71,7 +71,7 @@ jobs:
           ignoreLabels: |
             dependencies
           # allow the use of the "[WIP] feat: some new feature" syntax
-          wip: true
+          # wip: true
 
   label-pr:
     runs-on: ubuntu-latest
