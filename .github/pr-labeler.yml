@@ -1,0 +1,18 @@
+add-missing-labels: true
+# Whether to remove prexisting labels from the PR
+clear-prexisting: false
+# Consider the PR commit messages when adding labels
+include-commits: false
+# Consider the PR title when adding labels
+include-title: true
+# Label to be used when the message has the breaking change syntax '!:'
+# E.g. "feat!: This break things"
+label-for-breaking-changes: 'breaking'
+label-mapping:
+  breaking: ['breaking','BREAKING CHANGE','breaking change','breaking changes']
+  bug: ['fix']
+  documentation: ['docs']
+  feature: ['feat','feature']
+  dependencies: ['dependencies']
+  misc: ['perf','refactor','revert','style','test']
+  no-release: ['build','chore','ci']

@@ -1,0 +1,80 @@
+name: pr-labeler
+
+on:
+  workflow_call:
+    secrets:
+      GITHUB_ACCESS_TOKEN:
+        description: "(ie: GITHUB_TOKEN) GitHub token"
+        required: true
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  pr-triage:
+    runs-on: ubuntu-latest
+
+    permissions:
+      pull-requests: write # to add labels to the PR
+
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@5c7944e73c4c2a096b17a9cb74d65b6c2bbafbde # v2.9.1
+        with:
+          disable-sudo: true
+          egress-policy: block
+          allowed-endpoints: >
+            api.github.com:443
+
+      # https://github.com/marketplace/actions/semantic-pull-request
+      - name: Validate PR title
+        uses: amannn/action-semantic-pull-request@0723387faaf9b38adef4775cd42cfd5155ed6017 # v5.5.3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+        with:
+          # Configure which types are allowed (newline-delimited).
+          # Default: https://github.com/commitizen/conventional-commit-types
+          types: |
+            BREAKING CHANGE
+            build
+            chore
+            ci
+            dependencies
+            docs
+            feat
+            fix
+            perf
+            refactor
+            revert
+            style
+            test
+          # Configure which scopes are allowed (newline-delimited).
+          # These are regex patterns auto-wrapped in `^ $`.
+          scopes: |
+            (#\d{2,}|github-actions|nuget)
+          # Configure that a scope must always be provided.
+          requireScope: false
+          # Configure additional validation for the subject based on a regex.
+          # This example ensures the subject doesn't start with an uppercase character.
+          subjectPattern: ^.{4,}$
+          # If `subjectPattern` is configured, you can use this property to override
+          # the default error message that is shown when the pattern doesn't match.
+          # The variables `subject` and `title` can be used within the message.
+          subjectPatternError: |
+            The subject "{subject}" found in the pull request title "{title}"
+            didn't match the configured pattern. Subject must be at least four characters long.
+          # If the PR contains one of these newline-delimited labels, the
+          # validation is skipped. If you want to rerun the validation when
+          # labels change, you might want to use the `labeled` and `unlabeled`
+          # event triggers in your workflow.
+          ignoreLabels: |
+            dependencies
+          # allow the use of the "[WIP] feat: some new feature" syntax
+          # wip: true
+
+      # config in /.github/pr-labeler.yml
+      - name: Label PR
+        uses: grafana/pr-labeler-action@50737759cb150f5d312de1a45559027156db8bab # v0.1.0
+        with:
+          token: ${{ secrets.GITHUB_ACCESS_TOKEN }}
