@@ -4,12 +4,22 @@ on:
   workflow_call:
     inputs:
       os-list:
-        description: A comma separated list of operating system(s) to run the build and test jobs on. e.g. "ubuntu-latest, windows-latest". First item in the list will be used for non-matrix jobs.
+        description: A comma separated list of operating system(s) to run the build and test jobs on. e.g. "ubuntu-latest, windows-latest". Other jobs use the 'os' input.
         required: false
         type: string
         default: ubuntu-latest
       dotnet-version-list:
-        description: A comma separated list of dotnet version(s) to run the build and test jobs on. e.g. "8.0.x, 7.0.x, 6.0.x". First item in the list will be used for non-matrix jobs.
+        description: A comma separated list of dotnet version(s) to run the build and test jobs on. e.g. "6.0.x, 7.0.x, 8.0.x". Other jobs use the 'dotnet-version' input.
+        required: false
+        type: string
+        default: 8.0.x
+      os:
+        description: The operating system to run non-matrix jobs on. e.g. "ubuntu-latest" or "windows-latest".
+        required: false
+        type: string
+        default: ubuntu-latest
+      dotnet-version:
+        description: The dotnet version to run the non-matrix jobs on. e.g. "8.0.x".
         required: false
         type: string
         default: 8.0.x
@@ -58,8 +68,8 @@ jobs:
       - get-version
     uses: ./.github/workflows/_dotnet-build-and-package.yml
     with:
-      os: ubuntu-latest
-      dotnet-version: 8.0.x
+      os: ${{ inputs.os }}
+      dotnet-version: ${{ inputs.dotnet-version }}
       package-version: ${{ needs.get-version.outputs.version }}
       package-artifact-name: "packages"
       add-assembly-version: ${{ inputs.is-release }}
@@ -71,8 +81,8 @@ jobs:
       packages: write
     uses: ./.github/workflows/_dotnet-publish-package.yml
     with:
-      os: ubuntu-latest
-      dotnet-version: 8.0.x
+      os: ${{ inputs.os }}
+      dotnet-version: ${{ inputs.dotnet-version }}
       package-artifact-name: "packages"
       upload-to-github: ${{ !inputs.is-release }}
       upload-to-nuget: ${{ inputs.is-release }}
@@ -89,6 +99,7 @@ jobs:
       contents: write
     uses: ./.github/workflows/_github-tag-and-release.yml
     with:
+      os: ${{ inputs.os }}
       version: ${{ needs.get-version.outputs.version }}
     secrets:
       GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
