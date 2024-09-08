@@ -8,6 +8,9 @@ permissions:
 
 jobs:
   dependabot-auto-approve-and-merge:
+    permissions:
+      contents: write
+      pull-requests: write
     uses: ./.github/workflows/_dependabot-auto-approve-and-merge.yml
     with:
       is-fork: ${{ github.event.repository.fork }}
