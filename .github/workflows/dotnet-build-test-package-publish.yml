@@ -38,12 +38,13 @@ on:
         required: true
     secrets:
       GITHUB_ACCESS_TOKEN:
-        description: "(ie: GITHUB_TOKEN) GitHub token to upload package to GitHub Package Registry. Required if upload-to-github is true"
-        required: false
+        description: "(ie: GITHUB_TOKEN) GitHub token"
+        required: true
       NUGET_API_KEY:
         description: "API key for nuget.org. Required if upload-to-nuget is true"
         required: false
       CODECOV_TOKEN:
+        description: "Token for CodeCov. Required if codecov-slug is set"
         required: false
 
 permissions:
