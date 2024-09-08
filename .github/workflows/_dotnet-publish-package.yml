@@ -1,0 +1,94 @@
+name: dotnet-publish-package
+
+on:
+  workflow_call:
+    inputs:
+      os:
+        required: false
+        type: string
+        default: ubuntu-latest
+      dotnet-version:
+        required: false
+        type: string
+        default: 8.0.x
+      package-artifact-name:
+        description: "Name of the artifact to upload to github build artifacts. Should match what was uploaded in dotnet-build-and-package"
+        required: false
+        type: string
+        default: "packages"
+      upload-to-github:
+        description: "Upload pacakge to github package registry"
+        type: boolean
+        required: false
+        default: false
+      upload-to-nuget:
+        description: "Upload pacakge to nuget.org registry"
+        type: boolean
+        required: false
+        default: false
+    secrets:
+      GITHUB_ACCESS_TOKEN:
+        description: "(ie: GITHUB_TOKEN) GitHub token to upload package to GitHub Package Registry. Required if upload-to-github is true"
+        required: false
+      NUGET_API_KEY:
+        description: "API key for nuget.org. Required if upload-to-nuget is true"
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  publish-nuget-package:
+    runs-on: ${{ inputs.os }}
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@5c7944e73c4c2a096b17a9cb74d65b6c2bbafbde # v2.9.1
+        with:
+          disable-sudo: true
+          egress-policy: block
+          allowed-endpoints: >
+            aka.ms:443
+            api.nuget.org:443
+            dc.services.visualstudio.com:443
+            dotnetcli.azureedge.net:443
+            nuget.pkg.github.com:443
+            www.nuget.org:443
+
+      # Download the artifact generated in the build job
+      - name: Download artifact
+        uses: actions/download-artifact@65a9edc5881444af0b9093a5e628f2fe47ea3b2e # 4.1.7
+        with:
+          name: ${{ inputs.package-artifact-name }}
+          path: ./build-packages # Path to download the artifact
+
+      - name: Install .NET Core ${{ inputs.dotnet-version }}
+        uses: actions/setup-dotnet@6bd8b7f7774af54e05809fcc5431931b3eb1ddee # v4.0.1
+        with:
+          dotnet-version: ${{ inputs.dotnet-version }}
+
+      - name: Publish nuget pacakge(s) to GitHub Package Registry
+        if: ${{ inputs.upload-to-github }}
+        run: >
+          dotnet nuget push ./build-packages/*.nupkg
+          --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+          --api-key ${{ secrets.GITHUB_ACCESS_TOKEN }}
+
+      - name: Publish symbol pacakge(s) to GitHub Package Registry
+        if: ${{ inputs.upload-to-github }}
+        run: >
+          dotnet nuget push ./build-packages/*.snupkg
+          --skip-duplicate
+          --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+          --api-key ${{ secrets.GITHUB_ACCESS_TOKEN }}
+
+      - name: Publish nuget and symbols package(s) to NuGet.org
+        if: ${{ inputs.upload-to-nuget }}
+        run: >
+          dotnet nuget push ./build-packages/*.nupkg
+          --source https://api.nuget.org/v3/index.json
+          --api-key ${{ secrets.NUGET_API_KEY }}

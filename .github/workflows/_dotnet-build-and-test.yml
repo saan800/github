@@ -1,0 +1,131 @@
+name: dotnet-build-and-test
+
+on:
+  workflow_call:
+    inputs:
+      os-list:
+        description: A comma separated list of operating system(s) to run the build and test jobs on. e.g. "ubuntu-latest, windows-latest".
+        required: false
+        type: string
+        default: ubuntu-latest
+      dotnet-version-list:
+        description: A comma separated list of dotnet version(s) to run the build and test jobs on. e.g. "6.0.x, 7.0.x, 8.0.x".
+        required: false
+        type: string
+        default: 8.0.x
+      codecov-slug:
+        description: "Slug to upload code coverage results for Codecov. e.g. saan800/saansoft-correlationId"
+        required: false
+        type: string
+      codecov-flag:
+        description: "Flag to use for Codecov. e.g. unittests"
+        required: false
+        type: string
+        default: unittests
+    secrets:
+      CODECOV_TOKEN:
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  generate-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      os_array: ${{ steps.generate-matrix.outputs.os_array }}
+      dotnet_version_array: ${{ steps.generate-matrix.outputs.dotnet_version_array }}
+
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@5c7944e73c4c2a096b17a9cb74d65b6c2bbafbde # v2.9.1
+        with:
+          disable-sudo: true
+          egress-policy: block
+          allowed-endpoints: >
+
+      - name: Generate Matrix Variables
+        id: generate-matrix
+        run: |
+          tempOsList="${{ inputs.os-list }}"
+          tempOsList="${tempOsList//', '/','}"
+          echo "os_array=[\"${tempOsList//','/\",\"}\"]" >> $GITHUB_OUTPUT
+
+          tempVersionList="${{ inputs.dotnet-version-list }}"
+          tempVersionList="${tempVersionList//', '/','}"
+          echo "dotnet_version_array=[\"${tempVersionList//','/\",\"}\"]" >> $GITHUB_OUTPUT
+
+      - name: Show Matrix Variables
+        run: |
+          echo "os_array=${{ steps.generate-matrix.outputs.os_array }}"
+          echo "dotnet_version_array=${{ steps.generate-matrix.outputs.dotnet_version_array }}"
+
+  dotnet-build-and-test:
+    needs: generate-matrix
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ${{fromJson(needs.generate-matrix.outputs.os_array)}}
+        dotnet-version: ${{fromJson(needs.generate-matrix.outputs.dotnet_version_array)}}
+
+    name: dotnet-build-and-test-${{ matrix.os }}-${{ matrix.dotnet-version }}
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@5c7944e73c4c2a096b17a9cb74d65b6c2bbafbde # v2.9.1
+        with:
+          disable-sudo: true
+          egress-policy: block
+          allowed-endpoints: >
+            aka.ms:443
+            api.codecov.io:443
+            api.nuget.org:443
+            cli.codecov.io:443
+            dc.services.visualstudio.com:443
+            dotnetcli.azureedge.net:443
+            github.com:443
+            storage.googleapis.com:443
+
+      - name: Checkout
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+
+      # Cache .NET dependencies
+      - name: Cache .NET packages
+        uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # 4.0.2
+        with:
+          path: ~/.nuget/packages # Path to the NuGet package cache
+          key: ${{ matrix.os }}-${{ matrix.dotnet-version }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            ${{ matrix.os }}-${{ matrix.dotnet-version }}-nuget-
+
+      - name: Install .NET Core ${{ matrix.dotnet-version }}
+        uses: actions/setup-dotnet@6bd8b7f7774af54e05809fcc5431931b3eb1ddee # v4.0.1
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+
+      - name: Restore packages
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Run unit tests
+        run: >
+          dotnet test
+          --no-restore
+          --configuration Release
+          --logger "GitHubActions;summary.includePassedTests=true;summary.includeSkippedTests=true;annotations.titleFormat=@test;annotations.messageFormat=@error\n@trace"
+          /p:CollectCoverage=true
+          --
+          RunConfiguration.CollectSourceInformation=true
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@e28ff129e5465c2c0dcc6f003fc735cb6ae0c673 # v4.5.0
+        if: inputs.codecov-slug != ''
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          directory: ./reports/coverage/
+          fail_ci_if_error: false
+          flags: ${{ inputs.codecov-flag }}, ${{ matrix.dotnet-version }}, ${{ matrix.os }}
+          slug: ${{ inputs.codecov-slug }}

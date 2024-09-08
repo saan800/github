@@ -1,2 +1,3 @@
-# github
-Reusable github files
+# GitHub
+
+Common GitHub files that can be re-used across repos

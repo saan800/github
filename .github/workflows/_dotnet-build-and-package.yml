@@ -1,0 +1,98 @@
+name: dotnet-build-and-package
+
+on:
+  workflow_call:
+    inputs:
+      os:
+        required: false
+        type: string
+        default: ubuntu-latest
+      dotnet-version:
+        required: false
+        type: string
+        default: 8.0.x
+      package-version:
+        required: true
+        type: string
+      package-artifact-name:
+        description: "Name of the artifact to upload to github build artifacts"
+        required: false
+        type: string
+        default: "packages"
+      add-assembly-version:
+        description: "Should only include assembly version on main branch"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  dotnet-build-and-package:
+    runs-on: ${{ inputs.os }}
+
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@5c7944e73c4c2a096b17a9cb74d65b6c2bbafbde # v2.9.1
+        with:
+          disable-sudo: true
+          egress-policy: block
+          allowed-endpoints: >
+            aka.ms:443
+            api.nuget.org:443
+            dc.services.visualstudio.com:443
+            dotnetcli.azureedge.net:443
+            github.com:443
+
+      - name: Checkout
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+
+      # Cache .NET dependencies
+      - name: Cache .NET packages
+        uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # 4.0.2
+        with:
+          path: ~/.nuget/packages # Path to the NuGet package cache
+          key: ${{ inputs.os }}-${{ inputs.dotnet-version }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            ${{ inputs.os }}-${{ inputs.dotnet-version }}-nuget-
+
+      - name: Install .NET Core ${{ inputs.dotnet-version }}
+        uses: actions/setup-dotnet@6bd8b7f7774af54e05809fcc5431931b3eb1ddee # v4.0.1
+        with:
+          dotnet-version: ${{ inputs.dotnet-version }}
+
+      - name: Restore packages
+        run: dotnet restore
+
+      # Only include assembly version on main branch
+      - name: Package with assembly number
+        if: ${{ inputs.add-assembly-version }}
+        run: >
+          dotnet pack
+          --no-restore
+          --configuration Release
+          --output build-packages
+          /p:Version=${{ inputs.package-version }}
+          /p:FileVersion=${{ inputs.package-version }}
+          /p:AssemblyVersion=${{ inputs.package-version }}
+          /p:AssemblyInformationalVersion=${{ inputs.package-version }}
+
+      # Packaging step for non-main branches (without AssemblyVersion)
+      - name: Package without assembly number
+        if: ${{ !inputs.add-assembly-version }}
+        run: >
+          dotnet pack
+          --no-restore
+          --configuration Release
+          --output build-packages
+          /p:Version=${{ inputs.package-version }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
+        with:
+          name: ${{ inputs.package-artifact-name }}
+          path: |
+            build-packages/*.nupkg
+            build-packages/*.snupkg
+          if-no-files-found: error
