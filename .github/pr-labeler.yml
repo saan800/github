@@ -7,12 +7,14 @@ include-commits: false
 include-title: true
 # Label to be used when the message has the breaking change syntax '!:'
 # E.g. "feat!: This break things"
-label-for-breaking-changes: 'breaking'
+label-for-breaking-changes: "breaking"
 label-mapping:
-  breaking: ['breaking','BREAKING CHANGE','breaking change','breaking changes']
-  bug: ['fix']
-  documentation: ['docs']
-  feature: ['feat','feature']
-  dependencies: ['dependencies']
-  misc: ['perf','refactor','revert','style','test']
-  no-release: ['build','chore','ci']
+  breaking:
+    ["breaking", "BREAKING CHANGE", "breaking change", "breaking changes"]
+  bug: ["fix"]
+  documentation: ["docs"]
+  feature: ["feat", "feature"]
+  dependencies: ["dependencies"]
+  misc: ["perf", "refactor", "revert", "style", "test"]
+  configuration: ["build", "ci"]
+  no-release: ["build", "chore", "ci"]
