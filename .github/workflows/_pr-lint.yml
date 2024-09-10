@@ -5,22 +5,22 @@ on:
     inputs:
       validate-csharp:
         description: "Run C# linting"
-        required: true
+        required: false
         type: boolean
         default: false
       validate-editorconfig:
         description: "Run editorconfig linting"
-        required: true
+        required: false
         type: boolean
         default: false
       validate-github-actions:
         description: "Run GitHub Actions linting"
-        required: true
+        required: false
         type: boolean
         default: false
       validate-yaml:
         description: "Run YAML linting"
-        required: true
+        required: false
         type: boolean
         default: false
       cspell-config:
