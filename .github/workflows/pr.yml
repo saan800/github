@@ -1,12 +1,6 @@
 name: pr
 
-on:
-  pull_request:
-    types:
-      - opened
-      - edited
-      - synchronize
-      - reopened
+on: pull_request
 
 permissions:
   contents: read
