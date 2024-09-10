@@ -17,4 +17,4 @@ label-mapping:
   dependencies: ["dependencies"]
   misc: ["perf", "refactor", "revert", "style", "test"]
   configuration: ["build", "ci"]
-  no-release: ["build", "chore", "ci"]
+  no-release: ["build", "chore"]
