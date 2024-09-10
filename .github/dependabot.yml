@@ -5,6 +5,7 @@ updates:
     directory: "/"
     schedule:
       interval: daily
+      day: friday
       time: "18:30"
       timezone: "Australia/Perth"
     commit-message:
