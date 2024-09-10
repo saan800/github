@@ -7,22 +7,18 @@ on:
         description: "Run C# linting"
         required: false
         type: boolean
-        default: false
       validate-editorconfig:
         description: "Run editorconfig linting"
         required: false
         type: boolean
-        default: false
       validate-github-actions:
         description: "Run GitHub Actions linting"
         required: false
         type: boolean
-        default: false
       validate-yaml:
         description: "Run YAML linting"
         required: false
         type: boolean
-        default: false
       cspell-config:
         description: "Path to the cspell configuration file. Required to run spell-checking. eg '.cspell.json'"
         required: false
