@@ -1,0 +1,95 @@
+name: pr-lint
+
+on:
+  workflow_call:
+    inputs:
+      validate-csharp:
+        description: "Run C# linting"
+        required: false
+        type: boolean
+        default: true
+      validate-editorconfig:
+        description: "Run editorconfig linting"
+        required: false
+        type: boolean
+        default: true
+      validate-github-actions:
+        description: "Run GitHub Actions linting"
+        required: false
+        type: boolean
+        default: true
+      validate-yaml:
+        description: "Run YAML linting"
+        required: false
+        type: boolean
+        default: true
+      cspell-config:
+        description: "Path to the cspell configuration file. Required to run spell-checking. eg '.cspell.json'"
+        required: false
+        type: string
+    secrets:
+      GITHUB_ACCESS_TOKEN:
+        description: "(ie: GITHUB_TOKEN) GitHub token"
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  super-linter:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@5c7944e73c4c2a096b17a9cb74d65b6c2bbafbde # v2.9.1
+        with:
+          disable-sudo: true
+          egress-policy: block
+          allowed-endpoints: >
+            api.github.com:443
+            github.com:443
+
+      - name: Checkout
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        with:
+          # super-linter needs the full git history to get the
+          # list of files that changed across commits
+          fetch-depth: 0
+
+      - name: Run super-linter
+        uses: super-linter/super-linter@b92721f792f381cedc002ecdbb9847a15ece5bb8 # v7.1.0
+        env:
+          # To report GitHub Actions status checks
+          GITHUB_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+          FILTER_REGEX_EXCLUDE: (./\.editorconfig|\.idea/*|\.vscode/*)
+          IGNORE_GENERATED_FILES: true
+          # false -> only checks changed files
+          VALIDATE_ALL_CODEBASE: false
+          VALIDATE_CSHARP: ${{ inputs.validate-csharp }}
+          VALIDATE_EDITORCONFIG: ${{ inputs.validate-editorconfig }}
+          VALIDATE_GITHUB_ACTIONS: ${{ inputs.validate-github-actions }}
+          VALIDATE_YAML: ${{ inputs.validate-yaml }}
+          GITHUB_ACTIONS_COMMAND_ARGS: --ignore 'Double quote to prevent globbing and word splitting'
+          ENABLE_GITHUB_ACTIONS_STEP_SUMMARY: true
+
+  spell-check:
+    runs-on: ubuntu-latest
+    if: ${{ inputs.cspell-config != null }}
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@5c7944e73c4c2a096b17a9cb74d65b6c2bbafbde # v2.9.1
+        with:
+          disable-sudo: true
+          egress-policy: block
+          allowed-endpoints: >
+            github.com:443
+
+      - name: Checkout
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+
+      - name: Spellcheck
+        uses: streetsidesoftware/cspell-action@934c74da3775ac844ec89503f666f67efb427fed # v6.8.1
+        with:
+          config: ${{ inputs.cspell-config }}
+          check_dot_files: false
+          incremental_files_only: true
