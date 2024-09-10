@@ -20,7 +20,6 @@ jobs:
       contents: read
     uses: ./.github/workflows/_pr-lint.yml
     with:
-      validate-github-actions: true
-      validate-yaml: true
+      run-lint: true
     secrets:
       GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}

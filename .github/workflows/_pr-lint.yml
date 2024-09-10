@@ -3,26 +3,10 @@ name: pr-lint
 on:
   workflow_call:
     inputs:
-      validate-csharp:
-        description: "Run C# linting"
+      run-lint:
         required: false
         type: boolean
-        default: true
-      validate-editorconfig:
-        description: "Run editorconfig linting"
-        required: false
-        type: boolean
-        default: true
-      validate-github-actions:
-        description: "Run GitHub Actions linting"
-        required: false
-        type: boolean
-        default: true
-      validate-yaml:
-        description: "Run YAML linting"
-        required: false
-        type: boolean
-        default: true
+        default: false
       cspell-config:
         description: "Path to the cspell configuration file. Required to run spell-checking. eg '.cspell.json'"
         required: false
@@ -38,6 +22,7 @@ permissions:
 jobs:
   super-linter:
     runs-on: ubuntu-latest
+    if: ${{ inputs.run-lint == true }}
 
     steps:
       - name: Harden Runner
@@ -65,10 +50,11 @@ jobs:
           IGNORE_GENERATED_FILES: true
           # false -> only checks changed files
           VALIDATE_ALL_CODEBASE: false
-          VALIDATE_CSHARP: ${{ inputs.validate-csharp }}
-          VALIDATE_EDITORCONFIG: ${{ inputs.validate-editorconfig }}
-          VALIDATE_GITHUB_ACTIONS: ${{ inputs.validate-github-actions }}
-          VALIDATE_YAML: ${{ inputs.validate-yaml }}
+          # only runs appropriate linters against the types of files that changed
+          VALIDATE_CSHARP: true
+          VALIDATE_EDITORCONFIG: true
+          VALIDATE_GITHUB_ACTIONS: true
+          VALIDATE_YAML: true
           GITHUB_ACTIONS_COMMAND_ARGS: --ignore 'Double quote to prevent globbing and word splitting'
           ENABLE_GITHUB_ACTIONS_STEP_SUMMARY: true
 
