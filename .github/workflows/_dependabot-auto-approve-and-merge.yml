@@ -3,12 +3,6 @@ name: dependabot-auto-approve-and-merge
 on:
   workflow_call:
     inputs:
-      is-fork:
-        required: true
-        type: boolean
-      user-login:
-        required: true
-        type: string
       pr-url:
         required: true
         type: string
@@ -25,11 +19,6 @@ jobs:
       pull-requests: write
     outputs:
       update-type: ${{ steps.dependabot-metadata.outputs.update-type }}
-
-    # Checking the author and fork will prevent your Action run failing on non-Dependabot PRs
-    if: |
-      ${{ inputs.is-fork }} == false &&
-      ${{ inputs.user-login }} == 'dependabot[bot]'
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@5c7944e73c4c2a096b17a9cb74d65b6c2bbafbde # v2.9.1
