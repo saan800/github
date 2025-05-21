@@ -33,7 +33,7 @@ jobs:
         id: dependabot-metadata
 
       - name: Check for merge conflicts
-        uses: sv-tools/block-merge-conflicts@ffb3bd78e226654de9f4882b4aa1c364851db475 # v1.3.0
+        uses: sv-tools/block-merge-conflicts@c9f26026bfa9565a090935a8dcaab90e580d88d0 # v1.4.0
         with:
           token: ${{ secrets.GITHUB_ACCESS_TOKEN }}
 
