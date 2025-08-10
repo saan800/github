@@ -58,7 +58,7 @@ jobs:
             ${{ inputs.os }}-${{ inputs.dotnet-version }}-nuget-
 
       - name: Install .NET Core ${{ inputs.dotnet-version }}
-        uses: actions/setup-dotnet@@v4
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ inputs.dotnet-version }}
 
