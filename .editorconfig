@@ -8,7 +8,7 @@ indent_style = space
 indent_size = 2
 insert_final_newline = true
 trim_trailing_whitespace = true
-max_line_length = 120
+max_line_length = 250
 spelling_languages = en-GB
 spelling_error_severity = warning
 spelling_exclusion_path = .\dictionary.dic
@@ -24,9 +24,6 @@ trim_trailing_whitespace = false
 max_line_length = off
 
 [*.sln, *.slnx, *.csproj, *.ruleset, *.props, *.targets]
-max_line_length = 250
-
-[examples/*.sln, examples/*.slnx, examples/*.csproj, examples/*.ruleset, examples/*.props, examples/*.targets]
 max_line_length = 250
 
 
