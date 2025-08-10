@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <IsPackable>true</IsPackable>
+
+        <Product>Examples.DotnetPackage</Product>
+        <Description>An example dotnet package to use with github build actions.</Description>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageTags>example;dotnet</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="README.md" Pack="true" PackagePath="\">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+
+</Project>
+
