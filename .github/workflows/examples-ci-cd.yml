@@ -1,32 +1,46 @@
-name: examples-dotnet-package-ci-cd
+name: example-ci-cd
 
 on:
-  pull_request:
   push:
-    branches:
-      - main
-    paths:
-      - "examples/**"
-      - "**/*"
-
-permissions:
-  contents: read
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
 
 jobs:
   ci-cd:
-    permissions:
-      contents: write
-      packages: write
-    # uses: saan800/github/.github/workflows/_dotnet-build-test-package-publish.yml@main
-    uses: ./.github/workflows/_dotnet-build-test-package-publish.yml
-    with:
-      os-list: "ubuntu-latest, windows-latest"
-      os: ubuntu-latest
-      dotnet-version-list: "7.0.x, 8.0.x"
-      dotnet-version: 8.0.x
-      codecov-slug: "saan800/examples-dotnet"
-      is-release: ${{ github.ref == 'refs/heads/main' }}
-    secrets:
-      GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-      NUGET_API_KEY: ${{ secrets.NUGET_TOKEN }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        dotnet: ["7.0.x", "8.0.x", "9.0.x"]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK ${{ matrix.dotnet }}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ matrix.dotnet }}
+
+      - name: Restore dependencies
+        working-directory: "../../examples/basic"
+        run: dotnet restore --use-lock-file
+
+      - name: Build
+        working-directory: "../../examples/basic"
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Run Tests
+        working-directory: "../../examples/basic"
+        run: dotnet test --no-build --configuration Release --collect:"XPlat Code Coverage"
+
+      # - name: Pack NuGet
+      #   run: dotnet pack --no-build --configuration Release
+
+      # - name: Upload Artifacts
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: nuget-packages-${{ matrix.dotnet }}
+      #     path: artifacts/packages/*.nupkg

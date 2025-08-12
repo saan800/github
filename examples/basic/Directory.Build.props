@@ -1,0 +1,18 @@
+<Project>
+
+  <PropertyGroup>
+<!--    <TargetFrameworks>net9.0;net8.0;net7.0</TargetFrameworks>-->
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <RestoreLockedMode>true</RestoreLockedMode>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <PackageOutputPath>$(MSBuildThisFileDirectory)artifacts\packages</PackageOutputPath>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn> <!-- optional: hides missing XML comment warnings -->
+  </PropertyGroup>
+
+</Project>

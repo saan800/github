@@ -9,3 +9,17 @@ updates:
       timezone: "Australia/Perth"
     commit-message:
       prefix: "chore(github-actions): "
+    labels:
+      - "dependencies"
+    open-pull-requests-limit: 10
+
+  # Keep NuGet packages up to date
+  - package-ecosystem: "nuget"
+    directory: "/examples/basic"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore(nuget): "
+    labels:
+      - "dependencies"
+    open-pull-requests-limit: 10
