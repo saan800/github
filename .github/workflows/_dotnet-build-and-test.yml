@@ -4,19 +4,20 @@ on:
   workflow_call:
     inputs:
       working-directory:
+        description: "The working directory for the job. Defaults to '.' which is the root of the repository. Do not include trailing '/'"
         required: false
         type: string
-        default: ""
+        default: "."
       os-list:
         description: A comma separated list of operating system(s) to run the build and test jobs on. e.g. "ubuntu-latest, windows-latest".
         required: false
         type: string
         default: ubuntu-latest
       dotnet-version-list:
-        description: A comma separated list of dotnet version(s) to run the build and test jobs on. e.g. "6.0.x, 7.0.x, 8.0.x".
+        description: A comma separated list of dotnet version(s) to run the build and test jobs on. e.g. "7.0.x, 8.0.x, 9.0.x".
         required: false
         type: string
-        default: 8.0.x
+        default: 9.0.x
       codecov-slug:
         description: "Slug to upload code coverage results for Codecov. e.g. saan800/saansoft-correlationId"
         required: false

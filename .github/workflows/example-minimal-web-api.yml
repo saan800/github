@@ -1,96 +1,103 @@
 name: example-minimal-web-api
 
 on:
-  push:
-    branches: ["main"]
   pull_request:
-    branches: ["main"]
+  push:
+    branches:
+      - main
 
 jobs:
-  ci-cd:
-    strategy:
-      fail-fast: false
-      matrix:
-        dotnet: ["9.0.x"]
-        os: ["ubuntu-latest"]
+  build-and-test:
+    uses: ./.github/workflows/_dotnet-build-and-test.yml
+    with:
+      working-directory: "./examples/MinimalWebApi"
+      os-list: "ubuntu-latest"
+      dotnet-version-list: "9.0.x"
+# jobs:
+#   ci-cd:
+#     strategy:
+#       fail-fast: false
+#       matrix:
+#         dotnet: ["9.0.x"]
+#         os: ["ubuntu-latest"]
 
-    runs-on: ${{ matrix.os }}
-    steps:
-      - name: Harden Runner
-        uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
-        with:
-          disable-sudo: true
-          egress-policy: block
-          allowed-endpoints: >
-            aka.ms:443
-            api.nuget.org:443
-            builds.dotnet.microsoft.com:443
-            ci.dot.net:443
-            cli.codecov.io:443
-            crl3.digicert.com:80
-            dc.services.visualstudio.com:443
-            github.com:443
+#     runs-on: ${{ matrix.os }}
+#     steps:
+#       - name: Harden Runner
+#         uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
+#         with:
+#           disable-sudo: true
+#           egress-policy: block
+#           allowed-endpoints: >
+#             aka.ms:443
+#             api.nuget.org:443
+#             builds.dotnet.microsoft.com:443
+#             ci.dot.net:443
+#             cli.codecov.io:443
+#             crl3.digicert.com:80
+#             dc.services.visualstudio.com:443
+#             github.com:443
 
-      - name: Checkout repository
-        uses: actions/checkout@v4
+#       - name: Checkout repository
+#         uses: actions/checkout@v4
 
-      - name: Setup .NET SDK ${{ matrix.dotnet }}
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: ${{ matrix.dotnet }}
+#       - name: Setup .NET SDK ${{ matrix.dotnet }}
+#         uses: actions/setup-dotnet@v4
+#         with:
+#           dotnet-version: ${{ matrix.dotnet }}
 
-      - name: Cache NuGet packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.nuget/packages
-          key: ${{ runner.os }}-${{ matrix.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-${{ matrix.os }}-nuget-
+#       - name: Cache NuGet packages
+#         uses: actions/cache@v4
+#         with:
+#           path: ~/.nuget/packages
+#           key: ${{ runner.os }}-${{ matrix.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+#           restore-keys: |
+#             ${{ runner.os }}-${{ matrix.os }}-nuget-
 
-      - name: Restore packages
-        working-directory: "./examples/MinimalWebApi"
-        run: dotnet restore --use-lock-file
+#       - name: Restore packages
+#         working-directory: "./examples/MinimalWebApi"
+#         run: dotnet restore --use-lock-file
 
-      - name: Verify ALL lock files are up-to-date
-        working-directory: "examples/MinimalWebApi"
-        run: |
-          dotnet restore /bl
-          stale_files=0
-          while IFS= read -r lockfile; do
-            if ! git diff --exit-code "$lockfile" > /dev/null; then
-              echo "❌ Lock file out of date: $lockfile"
-              stale_files=1
-            fi
-          done < <(find . -name "packages.lock.json" -type f)
-          if [ $stale_files -ne 0 ]; then
-            echo "Run 'dotnet restore' locally and commit updated lock files."
-            exit 1
-          fi
+#       - name: Verify ALL lock files are up-to-date
+#         working-directory: "examples/MinimalWebApi"
+#         run: |
+#           dotnet restore /bl
+#           stale_files=0
+#           while IFS= read -r lockfile; do
+#             if ! git diff --exit-code "$lockfile" > /dev/null; then
+#               echo "❌ Lock file out of date: $lockfile"
+#               stale_files=1
+#             fi
+#           done < <(find . -name "packages.lock.json" -type f)
+#           if [ $stale_files -ne 0 ]; then
+#             echo "Run 'dotnet restore' locally and commit updated lock files."
+#             exit 1
+#           fi
 
-      - name: Build
-        working-directory: "./examples/MinimalWebApi"
-        run: dotnet build --no-restore --configuration Release
+#       - name: Build
+#         working-directory: "./examples/MinimalWebApi"
+#         run: dotnet build --no-restore --configuration Release
 
-      - name: Run unit tests
-        working-directory: "./examples/MinimalWebApi"
-        run: >
-          dotnet test
-          --no-restore
-          --configuration Release
-          --logger "GitHubActions;summary.includePassedTests=true;summary.includeSkippedTests=true;annotations.titleFormat=@test;annotations.messageFormat=@error\n@trace"
-          /p:CollectCoverage=true
-          --
-          RunConfiguration.CollectSourceInformation=true
+#       - name: Run unit tests
+#         working-directory: "./examples/MinimalWebApi"
+#         run: >
+#           dotnet test
+#           --no-restore
+#           --configuration Release
+#           --logger "GitHubActions;summary.includePassedTests=true;summary.includeSkippedTests=true;annotations.titleFormat=@test;annotations.messageFormat=@error\n@trace"
+#           /p:CollectCoverage=true
+#           --
+#           RunConfiguration.CollectSourceInformation=true
 
-      # - name: Upload coverage reports to Codecov
-      #   working-directory: "examples/MinimalWebApi"
-      #   uses: codecov/codecov-action@b9fd7d16f6d7d1b5d2bec1a2887e65ceed900238 # v4.6.0
-      #   # if: inputs.codecov-slug != ''
-      #   with:
-      #     token: ${{ secrets.CODECOV_TOKEN }}
-      #     directory: ./reports/coverage/
-      #     fail_ci_if_error: false
-      #     flags: unittests, ${{ matrix.dotnet-version }}, ${{ matrix.os }}
-      #     slug: saan800/github
-      #     # flags: ${{ inputs.codecov-flag }}, ${{ matrix.dotnet-version }}, ${{ matrix.os }}
-      #     # slug: ${{ inputs.codecov-slug }}
+#       # - name: Upload coverage reports to Codecov
+#       #   working-directory: "examples/MinimalWebApi"
+#       #   uses: codecov/codecov-action@b9fd7d16f6d7d1b5d2bec1a2887e65ceed900238 # v4.6.0
+#       #   # if: inputs.codecov-slug != ''
+#       #   with:
+#       #     token: ${{ secrets.CODECOV_TOKEN }}
+#       #     directory: ./reports/coverage/
+#       #     fail_ci_if_error: false
+#       #     flags: unittests, ${{ matrix.dotnet-version }}, ${{ matrix.os }}
+#       #     slug: saan800/github
+#       #     # flags: ${{ inputs.codecov-flag }}, ${{ matrix.dotnet-version }}, ${{ matrix.os }}
+#       #     # slug: ${{ inputs.codecov-slug }}

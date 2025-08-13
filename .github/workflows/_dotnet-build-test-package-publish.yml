@@ -9,20 +9,20 @@ on:
         type: string
         default: ubuntu-latest
       dotnet-version-list:
-        description: A comma separated list of dotnet version(s) to run the build and test jobs on. e.g. "6.0.x, 7.0.x, 8.0.x". Other jobs use the 'dotnet-version' input.
+        description: A comma separated list of dotnet version(s) to run the build and test jobs on. e.g. "7.0.x, 8.0.x, 9.0.x,". Other jobs use the 'dotnet-version' input.
         required: false
         type: string
-        default: 8.0.x
+        default: 9.0.x
       os:
         description: The operating system to run non-matrix jobs on. e.g. "ubuntu-latest" or "windows-latest".
         required: false
         type: string
         default: ubuntu-latest
       dotnet-version:
-        description: The dotnet version to run the non-matrix jobs on. e.g. "8.0.x".
+        description: The dotnet version to run the non-matrix jobs on. e.g. "9.0.x".
         required: false
         type: string
-        default: 8.0.x
+        default: 9.0.x
       codecov-slug:
         description: "Slug to upload code coverage results for Codecov. e.g. saan800/saansoft-correlationId"
         required: false

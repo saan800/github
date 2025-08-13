@@ -10,7 +10,7 @@ on:
       dotnet-version:
         required: false
         type: string
-        default: 8.0.x
+        default: 9.0.x
       package-artifact-name:
         description: "Name of the artifact to upload to github build artifacts. Should match what was uploaded in dotnet-build-and-package"
         required: false

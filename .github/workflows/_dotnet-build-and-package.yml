@@ -10,7 +10,7 @@ on:
       dotnet-version:
         required: false
         type: string
-        default: 8.0.x
+        default: 9.0.x
       package-version:
         required: true
         type: string
