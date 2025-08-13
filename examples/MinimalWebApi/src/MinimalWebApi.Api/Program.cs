@@ -57,8 +57,7 @@ var app = builder.Build();
 // if (app.Environment.IsDevelopment())
 // {
 // Enable OpenAPI JSON
-app.MapOpenApi(); //.CacheOutput();
-                  // Add Scalar UI pointing to the OpenAPI JSON
+app.MapOpenApi(); //.CacheOutput(); // Add Scalar UI pointing to the OpenAPI JSON
 app.MapScalarApiReference("docs", options =>
 {
     options

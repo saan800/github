@@ -13,6 +13,9 @@ spelling_languages = en-GB
 spelling_error_severity = warning
 spelling_exclusion_path = .\dictionary.dic
 
+[*.json]
+insert_final_newline = false
+
 [*.md]
 max_line_length = off
 trim_trailing_whitespace = false
