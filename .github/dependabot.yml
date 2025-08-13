@@ -15,11 +15,27 @@ updates:
 
   # Keep NuGet packages up to date
   - package-ecosystem: "nuget"
-    directory: "/examples/basic"
+    directory: "/examples/MinimalWebApi"
     schedule:
       interval: "weekly"
     commit-message:
       prefix: "chore(nuget): "
     labels:
       - "dependencies"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 5
+    allow:
+      - dependency-type: direct
+      - dependency-type: indirect
+    # Force lock file regeneration
+    rebase-strategy: auto
+    groups:
+      microsoft:
+        patterns:
+          - "Microsoft.*"
+      testing:
+        patterns:
+          - "AwesomeAssertions*"
+          - "coverlet*"
+          - "FakeItEasy*"
+          - "GitHubActionsTestLogger"
+          - "xunit*"

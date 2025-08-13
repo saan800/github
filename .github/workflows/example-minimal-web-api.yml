@@ -8,13 +8,13 @@ on:
 
 jobs:
   ci-cd:
-    runs-on: ubuntu-latest
-
     strategy:
       fail-fast: false
       matrix:
         dotnet: ["9.0.x"]
+        os: ["ubuntu-latest"]
 
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -24,14 +24,39 @@ jobs:
         with:
           dotnet-version: ${{ matrix.dotnet }}
 
-      - name: Restore dependencies
+      - name: Restore packages
         working-directory: "examples/MinimalWebApi"
         run: dotnet restore --use-lock-file
+
+      - name: Verify lock file is up to date
+        run: |
+          dotnet restore /bl
+          git diff --exit-code packages.lock.json || (
+            echo "❌ packages.lock.json is out of date. Please run 'dotnet restore' and commit the updated file." && exit 1
+          )
 
       - name: Build
         working-directory: "examples/MinimalWebApi"
         run: dotnet build --no-restore --configuration Release
 
-      - name: Run Tests
-        working-directory: "examples/MinimalWebApi"
-        run: dotnet test --no-build --configuration Release --collect:"XPlat Code Coverage"
+      - name: Run unit tests
+        run: >
+          dotnet test
+          --no-restore
+          --configuration Release
+          --logger "GitHubActions;summary.includePassedTests=true;summary.includeSkippedTests=true;annotations.titleFormat=@test;annotations.messageFormat=@error\n@trace"
+          /p:CollectCoverage=true
+          --
+          RunConfiguration.CollectSourceInformation=true
+
+      # - name: Upload coverage reports to Codecov
+      #   uses: codecov/codecov-action@b9fd7d16f6d7d1b5d2bec1a2887e65ceed900238 # v4.6.0
+      #   # if: inputs.codecov-slug != ''
+      #   with:
+      #     token: ${{ secrets.CODECOV_TOKEN }}
+      #     directory: ./reports/coverage/
+      #     fail_ci_if_error: false
+      #     flags: unittests, ${{ matrix.dotnet-version }}, ${{ matrix.os }}
+      #     slug: saan800/github
+      #     # flags: ${{ inputs.codecov-flag }}, ${{ matrix.dotnet-version }}, ${{ matrix.os }}
+      #     # slug: ${{ inputs.codecov-slug }}
