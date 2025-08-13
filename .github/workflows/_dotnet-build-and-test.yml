@@ -112,11 +112,11 @@ jobs:
             ${{ matrix.os }}-${{ matrix.dotnet-version }}-nuget-
 
       - name: Restore packages
-        working-directory: ${{ inputs.working-directory}}
+        working-directory: ${{ inputs.working-directory }}
         run: dotnet restore --use-lock-file
 
       - name: Verify ALL lock files are up-to-date
-        working-directory: ${{ inputs.working-directory}}
+        working-directory: ${{ inputs.working-directory }}
         run: |
           dotnet restore /bl
           stale_files=0
@@ -132,11 +132,11 @@ jobs:
           fi
 
       - name: Build
-        working-directory: ${{ inputs.working-directory}}
+        working-directory: ${{ inputs.working-directory }}
         run: dotnet build --no-restore --configuration Release
 
       - name: Run unit tests
-        working-directory: ${{ inputs.working-directory}}
+        working-directory: ${{ inputs.working-directory }}
         run: >
           dotnet test
           --no-restore

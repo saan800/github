@@ -39,3 +39,6 @@ updates:
           - "FakeItEasy*"
           - "GitHubActionsTestLogger"
           - "xunit*"
+      other:
+        patterns:
+          - "Scalar.AspNetCore*"

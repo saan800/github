@@ -3,6 +3,11 @@ name: dotnet-build-test-package-publish
 on:
   workflow_call:
     inputs:
+      working-directory:
+        description: "The working directory for the job. Defaults to '.' which is the root of the repository. Do not include trailing '/'"
+        required: false
+        type: string
+        default: "."
       os-list:
         description: A comma separated list of operating system(s) to run the build and test jobs on. e.g. "ubuntu-latest, windows-latest". Other jobs use the 'os' input.
         required: false
@@ -54,6 +59,7 @@ jobs:
   build-and-test:
     uses: ./.github/workflows/_dotnet-build-and-test.yml
     with:
+      working-directory: ${{ inputs.working-directory }}
       os-list: ${{ inputs.os-list }}
       dotnet-version-list: ${{ inputs.dotnet-version-list }}
       codecov-slug: ${{ inputs.codecov-slug }}
@@ -63,12 +69,13 @@ jobs:
   get-version:
     uses: ./.github/workflows/_version.yml
 
-  build-and-package:
+  package:
     needs:
       - build-and-test
       - get-version
     uses: ./.github/workflows/_dotnet-build-and-package.yml
     with:
+      working-directory: ${{ inputs.working-directory }}
       os: ${{ inputs.os }}
       dotnet-version: ${{ inputs.dotnet-version }}
       package-version: ${{ needs.get-version.outputs.version }}
@@ -76,12 +83,13 @@ jobs:
       add-assembly-version: ${{ inputs.is-release }}
 
   publish:
-    needs: build-and-package
+    needs: package
     permissions:
       contents: read
       packages: write
     uses: ./.github/workflows/_dotnet-publish-package.yml
     with:
+      working-directory: ${{ inputs.working-directory }}
       os: ${{ inputs.os }}
       dotnet-version: ${{ inputs.dotnet-version }}
       package-artifact-name: "packages"
