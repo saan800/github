@@ -9,3 +9,36 @@ updates:
       timezone: "Australia/Perth"
     commit-message:
       prefix: "chore(github-actions): "
+    labels:
+      - "dependencies"
+    open-pull-requests-limit: 10
+
+  # Keep NuGet packages up to date
+  - package-ecosystem: "nuget"
+    directory: "/examples/MinimalWebApi"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore(nuget): "
+    labels:
+      - "dependencies"
+    open-pull-requests-limit: 5
+    allow:
+      - dependency-type: direct
+      - dependency-type: indirect
+    # Force lock file regeneration
+    rebase-strategy: auto
+    groups:
+      microsoft:
+        patterns:
+          - "Microsoft.*"
+      testing:
+        patterns:
+          - "AwesomeAssertions*"
+          - "coverlet*"
+          - "FakeItEasy*"
+          - "GitHubActionsTestLogger"
+          - "xunit*"
+      other:
+        patterns:
+          - "Scalar.AspNetCore*"

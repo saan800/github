@@ -1,0 +1,56 @@
+# ********************************************** #
+# ******************** IDEs ******************** #
+# ********************************************** #
+
+############### Visual Studio Code ###############
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+################## Visual Studio #################
+# For more VS gitignore rules: https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
+
+.vs/
+.mono/
+
+*.DotSettings
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+################# JetBrains Rider ################
+# For more Rider gitignore rules: https://github.com/JetBrains/resharper-rider-samples/blob/master/.gitignore
+#.idea/
+
+
+# ********************************************** #
+# ******************** CODE ******************** #
+# ********************************************** #
+
+# compiled / generated output
+dist
+tmp
+/out-tsc
+
+# dependencies
+node_modules
+packages
+build-packages
+.DS_Store
+
+# .NET
+bin
+obj
+
+# LOGS, TESTS AND COVERAGE
+
+/coverage
+/reports
+npm-debug.log
+yarn-error.log
+testem.log
+bundle-stats.html
+
