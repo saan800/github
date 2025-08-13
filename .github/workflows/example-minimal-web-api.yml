@@ -39,23 +39,33 @@ jobs:
         with:
           dotnet-version: ${{ matrix.dotnet }}
 
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
       - name: Restore packages
         working-directory: "examples/MinimalWebApi"
         run: dotnet restore --use-lock-file
 
-      - name: Verify all lock files are up to date
+      - name: Verify ALL lock files are up-to-date
         working-directory: "examples/MinimalWebApi"
         run: |
           dotnet restore /bl
-
-          # Loop through every packages.lock.json file in the repo
-          find . -name "packages.lock.json" -type f | while read lockfile; do
+          stale_files=0
+          while IFS= read -r lockfile; do
             if ! git diff --exit-code "$lockfile" > /dev/null; then
               echo "❌ Lock file out of date: $lockfile"
-              echo "   Please run 'dotnet restore' and commit the updated file."
-              exit 1
+              stale_files=1
             fi
-          done
+          done < <(find . -name "packages.lock.json" -type f)
+          if [ $stale_files -ne 0 ]; then
+            echo "Run 'dotnet restore' locally and commit updated lock files."
+            exit 1
+          fi
 
       - name: Build
         working-directory: "examples/MinimalWebApi"
