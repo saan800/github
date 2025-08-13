@@ -1,4 +1,4 @@
-name: example-ci-cd
+name: example-minimal-web-api
 
 on:
   push:
@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        dotnet: ["7.0.x", "8.0.x", "9.0.x"]
+        dotnet: ["9.0.x"]
 
     steps:
       - name: Checkout repository
@@ -25,22 +25,13 @@ jobs:
           dotnet-version: ${{ matrix.dotnet }}
 
       - name: Restore dependencies
-        working-directory: "../../examples/basic"
+        working-directory: "../../examples/MinimalWebApi"
         run: dotnet restore --use-lock-file
 
       - name: Build
-        working-directory: "../../examples/basic"
+        working-directory: "../../examples/MinimalWebApi"
         run: dotnet build --no-restore --configuration Release
 
       - name: Run Tests
-        working-directory: "../../examples/basic"
+        working-directory: "../../examples/MinimalWebApi"
         run: dotnet test --no-build --configuration Release --collect:"XPlat Code Coverage"
-
-      # - name: Pack NuGet
-      #   run: dotnet pack --no-build --configuration Release
-
-      # - name: Upload Artifacts
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: nuget-packages-${{ matrix.dotnet }}
-      #     path: artifacts/packages/*.nupkg

@@ -1,4 +1,4 @@
-namespace Basic.Api.Schema.Items;
+namespace MinimalWebApi.Api.Schema.Items;
 
 public class Item
 {

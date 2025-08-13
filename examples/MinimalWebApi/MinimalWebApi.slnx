@@ -4,5 +4,5 @@
     <File Path="Directory.Build.props" />
     <File Path="Directory.Packages.props" />
   </Folder>
-  <Project Path="src\Basic.Api\Basic.Api.csproj" Type="Classic C#" />
+  <Project Path="src\MinimalWebApi.Api\MinimalWebApi.Api.csproj" Type="Classic C#" />
 </Solution>

@@ -1,3 +1,0 @@
-# Example Dotnet Package
-
-Something something ... important things the package does...

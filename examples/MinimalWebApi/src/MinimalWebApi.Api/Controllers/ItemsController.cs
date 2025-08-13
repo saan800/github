@@ -1,7 +1,7 @@
-using Basic.Api.Schema.Items;
 using Microsoft.AspNetCore.Mvc;
+using MinimalWebApi.Api.Schema.Items;
 
-namespace Basic.Api.Controllers;
+namespace MinimalWebApi.Api.Controllers;
 
 // TODO: dotnet v10 should have xml docs back
 // https://learn.microsoft.com/en-us/aspnet/core/fundamentals/openapi/openapi-comments?view=aspnetcore-10.0

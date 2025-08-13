@@ -15,14 +15,14 @@ builder.Services.AddOpenApi(o =>
     {
         document.Info = new OpenApiInfo
         {
-            Title = "My Basic API",
+            Title = "My Basic Minimal Web API",
             Version = "v1",
-            Description = "API for processing basic item CRUD",
+            Description = "Awesome api that does some things",
             Contact = new OpenApiContact
             {
                 Name = "Acme Ltd",
-                Email = "farley@basic.api",
-                Url = new Uri("https://basic.api"),
+                Email = "farley@example.com",
+                Url = new Uri("https://example.com"),
             }
         };
         return Task.CompletedTask;

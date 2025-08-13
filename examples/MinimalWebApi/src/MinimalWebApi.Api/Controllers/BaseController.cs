@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace Basic.Api.Controllers;
+namespace MinimalWebApi.Api.Controllers;
 
 [ApiController]
 [Consumes("application/json")]

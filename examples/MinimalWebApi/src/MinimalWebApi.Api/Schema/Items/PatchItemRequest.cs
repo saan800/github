@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Basic.Api.Schema.Items;
+namespace MinimalWebApi.Api.Schema.Items;
 
 public class PatchItemRequest
 {
