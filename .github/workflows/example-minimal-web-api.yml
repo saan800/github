@@ -28,13 +28,18 @@ jobs:
         working-directory: "examples/MinimalWebApi"
         run: dotnet restore --use-lock-file
 
-      - name: Verify lock file is up to date
-        working-directory: "examples/MinimalWebApi"
+      - name: Verify all lock files are up to date
         run: |
           dotnet restore /bl
-          git diff --exit-code packages.lock.json || (
-            echo "❌ packages.lock.json is out of date. Please run 'dotnet restore' and commit the updated file." && exit 1
-          )
+
+          # Loop through every packages.lock.json file in the repo
+          find . -name "packages.lock.json" -type f | while read lockfile; do
+            if ! git diff --exit-code "$lockfile" > /dev/null; then
+              echo "❌ Lock file out of date: $lockfile"
+              echo "   Please run 'dotnet restore' and commit the updated file."
+              exit 1
+            fi
+          done
 
       - name: Build
         working-directory: "examples/MinimalWebApi"
