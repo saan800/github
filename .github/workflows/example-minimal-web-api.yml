@@ -29,6 +29,7 @@ jobs:
         run: dotnet restore --use-lock-file
 
       - name: Verify lock file is up to date
+        working-directory: "examples/MinimalWebApi"
         run: |
           dotnet restore /bl
           git diff --exit-code packages.lock.json || (
@@ -40,6 +41,7 @@ jobs:
         run: dotnet build --no-restore --configuration Release
 
       - name: Run unit tests
+        working-directory: "examples/MinimalWebApi"
         run: >
           dotnet test
           --no-restore
@@ -50,6 +52,7 @@ jobs:
           RunConfiguration.CollectSourceInformation=true
 
       # - name: Upload coverage reports to Codecov
+      #   working-directory: "examples/MinimalWebApi"
       #   uses: codecov/codecov-action@b9fd7d16f6d7d1b5d2bec1a2887e65ceed900238 # v4.6.0
       #   # if: inputs.codecov-slug != ''
       #   with:
