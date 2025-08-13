@@ -56,16 +56,16 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 // if (app.Environment.IsDevelopment())
 // {
-    // Enable OpenAPI JSON
-    app.MapOpenApi(); //.CacheOutput();
-    // Add Scalar UI pointing to the OpenAPI JSON
-    app.MapScalarApiReference("docs", options =>
-    {
-        options
-            .WithTheme(ScalarTheme.DeepSpace)
-            .WithDefaultHttpClient(ScalarTarget.Shell, ScalarClient.Curl)
-            .AddDocument("v1");
-    });
+// Enable OpenAPI JSON
+app.MapOpenApi(); //.CacheOutput();
+                  // Add Scalar UI pointing to the OpenAPI JSON
+app.MapScalarApiReference("docs", options =>
+{
+    options
+        .WithTheme(ScalarTheme.DeepSpace)
+        .WithDefaultHttpClient(ScalarTarget.Shell, ScalarClient.Curl)
+        .AddDocument("v1");
+});
 // }
 
 app.UseHttpsRedirection();
