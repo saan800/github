@@ -3,6 +3,11 @@ name: dotnet-build-and-package
 on:
   workflow_call:
     inputs:
+      working-directory:
+        description: "The working directory for the job. Defaults to '.' which is the root of the repository. Do not include trailing '/'"
+        required: false
+        type: string
+        default: "."
       os:
         required: false
         type: string
@@ -10,7 +15,7 @@ on:
       dotnet-version:
         required: false
         type: string
-        default: 8.0.x
+        default: 9.0.x
       package-version:
         required: true
         type: string
@@ -34,7 +39,7 @@ jobs:
 
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
+        uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
         with:
           disable-sudo: true
           egress-policy: block
@@ -48,26 +53,27 @@ jobs:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
-      # Cache .NET dependencies
-      - name: Cache .NET packages
-        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # 4.2.3
-        with:
-          path: ~/.nuget/packages # Path to the NuGet package cache
-          key: ${{ inputs.os }}-${{ inputs.dotnet-version }}-nuget-${{ hashFiles('**/*.csproj') }}
-          restore-keys: |
-            ${{ inputs.os }}-${{ inputs.dotnet-version }}-nuget-
-
-      - name: Install .NET Core ${{ inputs.dotnet-version }}
+      - name: Setup .NET SDK ${{ inputs.dotnet-version }}
         uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4.3.1
         with:
           dotnet-version: ${{ inputs.dotnet-version }}
 
+      - name: Cache .NET packages
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # 4.2.4
+        with:
+          path: ~/.nuget/packages # Path to the NuGet package cache
+          key: ${{ inputs.os }}-${{ inputs.dotnet-version }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: |
+            ${{ inputs.os }}-${{ inputs.dotnet-version }}-nuget-
+
       - name: Restore packages
-        run: dotnet restore
+        working-directory: ${{ inputs.working-directory }}
+        run: dotnet restore --use-lock-file
 
       # Only include assembly version on main branch
       - name: Package with assembly number
         if: ${{ inputs.add-assembly-version }}
+        working-directory: ${{ inputs.working-directory }}
         run: >
           dotnet pack
           --no-restore
@@ -81,11 +87,12 @@ jobs:
       # Packaging step for non-main branches (without AssemblyVersion)
       - name: Package without assembly number
         if: ${{ !inputs.add-assembly-version }}
+        working-directory: ${{ inputs.working-directory }}
         run: >
           dotnet pack
           --no-restore
           --configuration Release
-          --output build-packages
+          --output ${{ inputs.working-directory }}/build-packages
           /p:Version=${{ inputs.package-version }}
 
       - name: Upload artifacts
@@ -93,6 +100,6 @@ jobs:
         with:
           name: ${{ inputs.package-artifact-name }}
           path: |
-            build-packages/*.nupkg
-            build-packages/*.snupkg
+            ${{ inputs.working-directory }}/build-packages/*.nupkg
+            ${{ inputs.working-directory }}/build-packages/*.snupkg
           if-no-files-found: error
