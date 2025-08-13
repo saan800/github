@@ -25,7 +25,7 @@ public class ItemsController : BaseController
     [EndpointDescription("Get an item's details for the provided id")]
     public IActionResult GetItem(int id)
     {
-        var  item = _items.FirstOrDefault(x => x.Id == id);
+        var item = _items.FirstOrDefault(x => x.Id == id);
         return item == null
             ? NotFound()
             : Ok(item);
@@ -60,8 +60,8 @@ public class ItemsController : BaseController
         var item = _items.FirstOrDefault(x => x.Id == id);
         if (item == null) return NotFound();
 
-        if(patchRequest.Name != null) item.Name = patchRequest.Name;
-        if(patchRequest.Description != null) item.Description = patchRequest.Description;
+        if (patchRequest.Name != null) item.Name = patchRequest.Name;
+        if (patchRequest.Description != null) item.Description = patchRequest.Description;
 
         _items = _items
             .Where(x => x.Id != item.Id)

@@ -51,7 +51,6 @@ builder.Services.AddOpenApi(o =>
     });
 });
 
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

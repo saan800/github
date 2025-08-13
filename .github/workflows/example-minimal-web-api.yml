@@ -25,13 +25,13 @@ jobs:
           dotnet-version: ${{ matrix.dotnet }}
 
       - name: Restore dependencies
-        working-directory: "../../examples/MinimalWebApi"
+        working-directory: "examples/MinimalWebApi"
         run: dotnet restore --use-lock-file
 
       - name: Build
-        working-directory: "../../examples/MinimalWebApi"
+        working-directory: "examples/MinimalWebApi"
         run: dotnet build --no-restore --configuration Release
 
       - name: Run Tests
-        working-directory: "../../examples/MinimalWebApi"
+        working-directory: "examples/MinimalWebApi"
         run: dotnet test --no-build --configuration Release --collect:"XPlat Code Coverage"
