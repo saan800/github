@@ -97,7 +97,7 @@ jobs:
       upload-to-nuget: ${{ inputs.is-release }}
     secrets:
       GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
-      NUGET_API_KEY: ${{ secrets.NUGET_TOKEN }}
+      NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
 
   release:
     needs:
