@@ -11,7 +11,24 @@ updates:
       prefix: "chore(github-actions): "
     labels:
       - "dependencies"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 10ation
+    rebase-strategy: auto
+    groups:
+      github-actions:
+        patterns:
+          - "actions/*"
+          - "dependabot*"
+      lint-actions:
+        patterns:
+          - "*/*-dependabot"
+          - "*cspell*"
+          - "super-linter*"
+      pr-actions:
+        patterns:
+          - "*block-merge-conflicts"
+          - "*pull-request*"
+          - "*pr-labeler*"
+          - "*version-increment"
 
   # Keep NuGet packages up to date
   - package-ecosystem: "nuget"
@@ -39,6 +56,6 @@ updates:
           - "FakeItEasy*"
           - "GitHubActionsTestLogger"
           - "xunit*"
-      other:
+      other-packages:
         patterns:
           - "Scalar.AspNetCore*"
