@@ -4,18 +4,18 @@
     "net9.0": {
       "Microsoft.AspNetCore.OpenApi": {
         "type": "Direct",
-        "requested": "[9.0.7, )",
-        "resolved": "9.0.7",
-        "contentHash": "8aG0mkgmA38IDJ0ca5HIpdexKjHXIh0z1kIdw5WyM6CrD4+CEt97UgSwBBBCHG6QQKV0hj2mfkwtEcqrJBcu8g==",
+        "requested": "[9.0.8, )",
+        "resolved": "9.0.8",
+        "contentHash": "BwF9sQCKmvu93C/pmKxJjPhF5fFB23MEcgTsGL+7W3wKLYawS4lyFSL5/qh00IJzuADLf+1SmvxMaphbyZYqQQ==",
         "dependencies": {
           "Microsoft.OpenApi": "1.6.17"
         }
       },
       "Scalar.AspNetCore": {
         "type": "Direct",
-        "requested": "[2.6.8, )",
-        "resolved": "2.6.8",
-        "contentHash": "2wwNX51ofrsgLNxe6n2bIuLEFcbVqp/le13nRaAs1mAuracL2tbTdIcgT89o3NmtvVa0hfBdxH5vAi1hwATqTw=="
+        "requested": "[2.6.9, )",
+        "resolved": "2.6.9",
+        "contentHash": "wIejm5++cWnu2jrkNiku+AvIClEEgp8c7GMQmTuT5LZeamEhHS1tvGEDJhfnPCZ4DPIMVX6e9b4tpzRJ2Qqy/w=="
       },
       "Microsoft.OpenApi": {
         "type": "Transitive",
