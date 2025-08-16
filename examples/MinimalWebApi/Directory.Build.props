@@ -31,7 +31,7 @@
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(IsTestProject)' == 'true'">
-<!--    <Using Include="AwesomeAssertions" />-->
+    <Using Include="AwesomeAssertions" />
 <!--    <Using Include="FakeItEasy" />-->
     <Using Include="Xunit" />
   </ItemGroup>
