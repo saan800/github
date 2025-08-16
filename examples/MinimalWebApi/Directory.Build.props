@@ -1,19 +1,39 @@
 <Project>
 
   <PropertyGroup>
-<!--    <TargetFrameworks>net9.0;net8.0;net7.0</TargetFrameworks>-->
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <RestorePackagesWithLockFile>True</RestorePackagesWithLockFile>
     <RestoreLockedMode>false</RestoreLockedMode>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <PackageOutputPath>$(MSBuildThisFileDirectory)artifacts\packages</PackageOutputPath>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn> <!-- optional: hides missing XML comment warnings -->
   </PropertyGroup>
+
+  <PropertyGroup>
+    <IsTestProject Condition="'$(IsTestProject)' == ''">false</IsTestProject>
+    <IsTestProject Condition="$(MSBuildProjectName.StartsWith('MinimalWebApi.Tests.'))">true</IsTestProject>
+    <IsPackable Condition="'$(IsTestProject)' == 'true'">false</IsPackable>
+    <IsPackable Condition="'$(IsPackable)' == ''">false</IsPackable>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(IsTestProject)' == 'true'">
+    <CollectCoverage>true</CollectCoverage>
+    <CoverletOutput>$([System.IO.Path]::Combine($(MSBuildProjectDirectory), "../../", 'reports', 'coverage'))/</CoverletOutput>
+    <CoverletOutputFormat>opencover,json</CoverletOutputFormat>
+    <MergeWith>$(CoverletOutput)/coverage.json</MergeWith>
+    <Exclude>[MinimalWebApi.Tests.*]*,[xunit.*]*</Exclude>
+  </PropertyGroup>
+
+  <ItemGroup Condition=" '$(IsTestProject)' == 'true'">
+<!--    <Using Include="AwesomeAssertions" />-->
+<!--    <Using Include="FakeItEasy" />-->
+    <Using Include="Xunit" />
+  </ItemGroup>
 
 </Project>
