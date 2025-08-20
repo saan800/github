@@ -1,6 +1,6 @@
-﻿namespace MinimalWebApi.Tests.Integration.Api;
+namespace MinimalWebApi.Tests.Integration.Api;
 
-public class UnitTest1
+public class TempTests
 {
     [Fact]
     public void Test1()

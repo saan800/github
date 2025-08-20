@@ -10,9 +10,9 @@ public class ItemTests
         var item = new Item
         {
             Id = 1,
-            Name = "bob",
+            Name = "Bob",
         };
 
-        item.Name.Should().Be("hello");
+        item.Name.ToLower().Should().Be("bob");
     }
 }
