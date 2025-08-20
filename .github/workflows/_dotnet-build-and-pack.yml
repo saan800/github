@@ -1,0 +1,105 @@
+name: dotnet-build-and-pack
+
+on:
+  workflow_call:
+    inputs:
+      working-directory:
+        description: "The working directory for the job. Defaults to '.' which is the root of the repository. Do not include trailing '/'"
+        required: false
+        type: string
+        default: "."
+      os:
+        required: false
+        type: string
+        default: ubuntu-latest
+      dotnet-version:
+        required: false
+        type: string
+        default: 9.0.x
+      package-version:
+        required: true
+        type: string
+      package-artifact-name:
+        description: "Name of the artifact to upload to github build artifacts"
+        required: false
+        type: string
+        default: "packages"
+      add-assembly-version:
+        description: "Should only include assembly version on main branch"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  dotnet-build-and-package:
+    runs-on: ${{ inputs.os }}
+
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
+        with:
+          disable-sudo: true
+          egress-policy: block
+          allowed-endpoints: >
+            aka.ms:443
+            api.nuget.org:443
+            dc.services.visualstudio.com:443
+            dotnetcli.azureedge.net:443
+            github.com:443
+
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - name: Setup .NET SDK ${{ inputs.dotnet-version }}
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4.3.1
+        with:
+          dotnet-version: ${{ inputs.dotnet-version }}
+
+      - name: Cache .NET packages
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # 4.2.4
+        with:
+          path: ~/.nuget/packages # Path to the NuGet package cache
+          key: ${{ inputs.os }}-${{ inputs.dotnet-version }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: |
+            ${{ inputs.os }}-${{ inputs.dotnet-version }}-nuget-
+
+      - name: Restore packages
+        working-directory: ${{ inputs.working-directory }}
+        run: dotnet restore --use-lock-file
+
+      # Only include assembly version on main branch
+      - name: Package with assembly number
+        if: ${{ inputs.add-assembly-version }}
+        working-directory: ${{ inputs.working-directory }}
+        run: >
+          dotnet pack
+          --no-restore
+          --configuration Release
+          --output build-packages
+          /p:Version=${{ inputs.package-version }}
+          /p:FileVersion=${{ inputs.package-version }}
+          /p:AssemblyVersion=${{ inputs.package-version }}
+          /p:AssemblyInformationalVersion=${{ inputs.package-version }}
+
+      # Packaging step for non-main branches (without AssemblyVersion)
+      - name: Package without assembly number
+        if: ${{ !inputs.add-assembly-version }}
+        working-directory: ${{ inputs.working-directory }}
+        run: >
+          dotnet pack
+          --no-restore
+          --configuration Release
+          --output ${{ inputs.working-directory }}/build-packages
+          /p:Version=${{ inputs.package-version }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: ${{ inputs.package-artifact-name }}
+          path: |
+            ${{ inputs.working-directory }}/build-packages/*.nupkg
+            ${{ inputs.working-directory }}/build-packages/*.snupkg
+          if-no-files-found: error
