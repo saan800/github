@@ -68,7 +68,7 @@ public class ItemControllerTests(TestHttpClientFactory factory)
         item.Should().NotBeNull();
         item.Id.Should().Be(itemToModify.Id);
         item.Name.Should().Be(itemToModify.Name);
-        item.Description.Should().Be(patchRequest.Description);;
+        item.Description.Should().Be(patchRequest.Description);
     }
 
     [Fact]

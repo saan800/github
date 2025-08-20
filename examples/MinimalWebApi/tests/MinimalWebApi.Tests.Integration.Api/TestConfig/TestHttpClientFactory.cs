@@ -23,8 +23,8 @@ public class TestHttpClientFactory : IDisposable
     public TestHttpClientFactory()
     {
         var environment = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT")
-                          ?? Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")
-                          ?? DefaultEnvironment;
+            ?? Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")
+            ?? DefaultEnvironment;
 
         // Load config
         var config = new ConfigurationBuilder()
