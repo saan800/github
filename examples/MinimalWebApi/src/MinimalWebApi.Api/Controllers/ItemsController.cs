@@ -9,12 +9,15 @@ namespace MinimalWebApi.Api.Controllers;
 [Route("api/[controller]")]
 public class ItemsController : BaseController
 {
-    private static List<Item> _items = [];
+    private static List<Item> _items = Enumerable
+        .Range(1, 5)
+        .Select(x => new Item { Id = x, Name = $"Item {x}" })
+        .ToList();
 
     [HttpGet]
     [ProducesResponseType(typeof(List<Item>), StatusCodes.Status200OK)]
     [EndpointDescription("Get all items, ordered by Id")]
-    public IActionResult GetAllItems()
+    public IActionResult GetAll()
     {
         return Ok(_items.OrderBy(x => x.Id));
     }
@@ -23,7 +26,7 @@ public class ItemsController : BaseController
     [ProducesResponseType(typeof(Item), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [EndpointDescription("Get an item's details for the provided id")]
-    public IActionResult GetItem(int id)
+    public IActionResult GetById(int id)
     {
         var item = _items.FirstOrDefault(x => x.Id == id);
         return item == null
@@ -48,7 +51,7 @@ public class ItemsController : BaseController
             .Append(newItem)
             .ToList();
 
-        return Created($"api/items/{newItem.Id}", null);
+        return Created($"/api/items/{newItem.Id}", null);
     }
 
     [HttpPatch("{id:int}")]
@@ -68,7 +71,7 @@ public class ItemsController : BaseController
             .Append(item)
             .ToList();
 
-        return Accepted($"api/items/{item.Id}");
+        return Accepted($"/api/items/{item.Id}");
     }
 
     [HttpDelete("{id:int}")]
