@@ -12,7 +12,7 @@
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <PackageOutputPath>$(MSBuildThisFileDirectory)artifacts\packages</PackageOutputPath>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <NoWarn>$(NoWarn);1591</NoWarn> <!-- optional: hides missing XML comment warnings -->
+    <NoWarn>CS1591</NoWarn> <!-- optional: hides missing XML comment warnings -->
   </PropertyGroup>
 
   <PropertyGroup>
@@ -23,6 +23,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(IsTestProject)' == 'true'">
+    <NoWarn>CS1591;CS8602;CS8625;CS8618</NoWarn>
     <CollectCoverage>true</CollectCoverage>
     <CoverletOutput>$([System.IO.Path]::Combine($(MSBuildProjectDirectory), "../../", 'reports', 'coverage'))/</CoverletOutput>
     <CoverletOutputFormat>opencover,json</CoverletOutputFormat>
