@@ -1,4 +1,4 @@
-name: dotnet-build-and-package
+name: dotnet-build-and-pack
 
 on:
   workflow_call:

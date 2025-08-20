@@ -1,4 +1,4 @@
-name: dotnet-build-test-package-publish
+name: dotnet-build-test-pack-publish
 
 on:
   workflow_call:
@@ -69,11 +69,11 @@ jobs:
   get-version:
     uses: ./.github/workflows/_version.yml
 
-  package:
+  pack:
     needs:
       - build-and-test
       - get-version
-    uses: ./.github/workflows/_dotnet-build-and-package.yml
+    uses: ./.github/workflows/_dotnet-build-and-pack.yml
     with:
       working-directory: ${{ inputs.working-directory }}
       os: ${{ inputs.os }}
@@ -83,7 +83,7 @@ jobs:
       add-assembly-version: ${{ inputs.is-release }}
 
   publish:
-    needs: package
+    needs: pack
     permissions:
       contents: read
       packages: write
