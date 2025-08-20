@@ -1,11 +1,12 @@
 ﻿<Solution>
+  <Folder Name="/Tests/">
+    <Project Path="tests\MinimalWebApi.Tests.Api\MinimalWebApi.Tests.Api.csproj" Type="Classic C#" />
+    <Project Path="tests\MinimalWebApi.Tests.Integration.Api\MinimalWebApi.Tests.Integration.Api.csproj" Type="Classic C#" />
+  </Folder>
   <Folder Name="/_solution/">
     <File Path=".dockerignore" />
     <File Path="Directory.Build.props" />
     <File Path="Directory.Packages.props" />
-  </Folder>
-  <Folder Name="/Tests/">
-    <Project Path="tests\MinimalWebApi.Tests.Integration.Api\MinimalWebApi.Tests.Integration.Api.csproj" Type="Classic C#" />
   </Folder>
   <Project Path="src\MinimalWebApi.Api\MinimalWebApi.Api.csproj" Type="Classic C#" />
 </Solution>

@@ -10,4 +10,15 @@
     <PackageVersion Include="xunit" Version="2.9.2"/>
     <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.2"/>
   </ItemGroup>
+
+
+  <ItemGroup Condition=" '$(IsTestProject)' == 'true'">
+    <PackageReference Include="AwesomeAssertions" />
+    <PackageReference Include="coverlet.collector" />
+    <PackageReference Include="coverlet.msbuild" />
+    <PackageReference Include="GitHubActionsTestLogger" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+  </ItemGroup>
 </Project>
