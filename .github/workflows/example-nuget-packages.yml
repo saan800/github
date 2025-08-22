@@ -33,12 +33,41 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ matrix.dotnet }}
-      - name: Restore (locked)
+
+      - name: Restore packages
+        working-directory: "./examples/NugetPackages"
         run: dotnet restore --locked-mode
+
+      - name: Verify ALL lock files are up-to-date
+        working-directory: "./examples/NugetPackages"
+        run: |
+          dotnet restore /bl
+          stale_files=0
+          while IFS= read -r lockfile; do
+            if ! git diff --exit-code "$lockfile" > /dev/null; then
+              echo "❌ Lock file out of date: $lockfile"
+              stale_files=1
+            fi
+          done < <(find . -name "packages.lock.json" -type f)
+          if [ $stale_files -ne 0 ]; then
+            echo "Run 'dotnet restore' locally and commit updated lock files."
+            exit 1
+          fi
+
       - name: Build
+        working-directory: "./examples/NugetPackages"
         run: dotnet build --no-restore -c Release
-      - name: Test
-        run: dotnet test --no-build -c Release --collect:"XPlat Code Coverage"
+
+      - name: Run unit tests
+        working-directory: "./examples/NugetPackages"
+        run: >
+          dotnet test
+          --no-restore
+          --configuration Release
+          --logger "GitHubActions;summary.includePassedTests=true;summary.includeSkippedTests=true;annotations.titleFormat=@test;annotations.messageFormat=@error\n@trace"
+          /p:CollectCoverage=true
+          --
+          RunConfiguration.CollectSourceInformation=true
 
   pack_pr:
     name: Version, Pack, Publish PR preview
@@ -49,10 +78,13 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "9.0.x"
-      - name: Restore (locked)
+
+      - name: Restore packages
+        working-directory: "./examples/NugetPackages"
         run: dotnet restore --locked-mode
 
       - name: Determine version (GitVersion)
@@ -62,21 +94,22 @@ jobs:
           useConfigFile: true
 
       - name: Pack all projects
+        working-directory: "./examples/NugetPackages"
         run: |
-          dotnet pack src/Package.Alpha/Package.Alpha.csproj -c Release -o ./artifacts \
+          dotnet pack src/NugetPackages.Alpha/NugetPackages.Alpha.csproj -c Release -o ./artifacts \
             -p:Version=${{ steps.gitversion.outputs.NuGetVersionV2 }}
-          dotnet pack src/Package.Bravo/Package.Bravo.csproj -c Release -o ./artifacts \
+          dotnet pack src/NugetPackages.Bravo/NugetPackages.Bravo.csproj -c Release -o ./artifacts \
             -p:Version=${{ steps.gitversion.outputs.NuGetVersionV2 }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: nuget-packages
-          path: artifacts/*.nupkg
+          path: examples/NugetPackages/artifacts/*.nupkg
 
       - name: Publish to GitHub Packages (PR previews)
         run: |
-          for f in artifacts/*.nupkg; do
+          for f in examples/NugetPackages/artifacts/*.nupkg; do
             dotnet nuget push "$f" \
               --source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" \
               --api-key ${{ github.token }} \
