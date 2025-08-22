@@ -1,0 +1,3 @@
+# NugetPackages.Bravo
+
+The second (but no less important) of the nuget packages the project is creating...
