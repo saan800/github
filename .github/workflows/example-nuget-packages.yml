@@ -26,7 +26,7 @@ jobs:
     with:
       working-directory: "./examples/NugetPackages"
       os-list: "ubuntu-latest"
-      dotnet-version-list: "8.0.x,9.0.x" # TODO: "8.0.x",
+      dotnet-version-list: "9.0.x" # TODO: "8.0.x",
 
   test:
     name: Test (SDK ${{ matrix.dotnet }})
@@ -42,10 +42,7 @@ jobs:
       - name: Setup .NET SDK ${{ matrix.dotnet }}
         uses: actions/setup-dotnet@v4
         with:
-          # dotnet-version: ${{ matrix.dotnet }}
-          dotnet-version: |
-            8.0.x
-            9.0.x
+          dotnet-version: ${{ matrix.dotnet }}
 
       - name: Restore packages
         working-directory: "./examples/NugetPackages"
