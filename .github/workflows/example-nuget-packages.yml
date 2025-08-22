@@ -37,15 +37,15 @@ jobs:
         dotnet: ["9.0.x"] # TODO: "8.0.x",
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
       - name: Setup .NET SDK ${{ matrix.dotnet }}
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4.3.1
         with:
           dotnet-version: ${{ matrix.dotnet }}
 
       - name: Restore packages
-        working-directory: "./examples/NugetPackages"
+        working-directory: ./examples/NugetPackages
         run: dotnet restore --use-lock-file
 
       - name: Verify ALL lock files are up-to-date
