@@ -26,7 +26,7 @@ jobs:
     with:
       working-directory: "./examples/NugetPackages"
       os-list: "ubuntu-latest"
-      dotnet-version-list: "8.0.x, 9.0.x" # TODO: "8.0.x",
+      dotnet-version-list: "9.0.x"
 
   test:
     name: Test (SDK ${{ matrix.dotnet }})
@@ -34,7 +34,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        dotnet: ["8.0.x", "9.0.x"]
+        dotnet: ["9.0.x"]
     steps:
       - name: Checkout
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
