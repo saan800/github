@@ -1,4 +1,4 @@
-name: ci
+name: example-nuget-packages
 
 on:
   pull_request:
@@ -21,6 +21,13 @@ jobs:
   #     - run: npm install @commitlint/{config-conventional,cli}
   #     - uses: wagoid/commitlint-github-action@v6
 
+  build-and-test:
+    uses: ./.github/workflows/_dotnet-build-and-test.yml
+    with:
+      working-directory: "./examples/NugetPackages"
+      os-list: "ubuntu-latest"
+      dotnet-version-list: "9.0.x"
+
   test:
     name: Test (SDK ${{ matrix.dotnet }})
     runs-on: ubuntu-latest
@@ -30,6 +37,7 @@ jobs:
         dotnet: ["8.0.x", "9.0.x"]
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ matrix.dotnet }}
