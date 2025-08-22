@@ -36,15 +36,17 @@ jobs:
       matrix:
         dotnet: ["9.0.x"] # TODO: "8.0.x",
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-dotnet@v4
+      - name: Setup .NET SDK ${{ matrix.dotnet }}
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ matrix.dotnet }}
 
       - name: Restore packages
         working-directory: "./examples/NugetPackages"
-        run: dotnet restore --locked-mode
+        run: dotnet restore --use-lock-file
 
       - name: Verify ALL lock files are up-to-date
         working-directory: "./examples/NugetPackages"
