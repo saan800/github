@@ -3,7 +3,7 @@ name: example-nuget-packages
 on:
   pull_request:
   push:
-    branches-ignore:
+    branches:
       - main
 
 permissions:
