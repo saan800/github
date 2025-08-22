@@ -42,7 +42,10 @@ jobs:
       - name: Setup .NET SDK ${{ matrix.dotnet }}
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: ${{ matrix.dotnet }}
+          # dotnet-version: ${{ matrix.dotnet }}
+          dotnet-version: |
+            8.0.x
+            9.0.x
 
       - name: Restore packages
         working-directory: "./examples/NugetPackages"
