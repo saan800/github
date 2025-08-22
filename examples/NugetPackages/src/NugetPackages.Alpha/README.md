@@ -1,0 +1,3 @@
+# NugetPackages.Alpha
+
+The first of the nuget packages the project is creating...

@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/Tests/">
+    <Project Path="tests\NugetPackages.Tests.Alpha\NugetPackages.Tests.Alpha.csproj" Type="Classic C#" />
+    <Project Path="tests\NugetPackages.Tests.Bravo\NugetPackages.Tests.Bravo.csproj" Type="Classic C#" />
+  </Folder>
+  <Folder Name="/_solution/">
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="nuget.config" />
+  </Folder>
+  <Project Path="src\NugetPackages.Alpha\NugetPackages.Alpha.csproj" Type="Classic C#" />
+  <Project Path="src\NugetPackages.Bravo\NugetPackages.Bravo.csproj" Type="Classic C#" />
+</Solution>
