@@ -46,19 +46,30 @@ jobs:
         working-directory: "./examples/NugetPackages"
         run: dotnet restore --use-lock-file
 
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v4.1.0
+        with:
+          versionSpec: "6.3.x"
+
       - name: Determine version (GitVersion)
         id: gitversion
-        uses: gittools/actions/gitversion/execute@v2
-        with:
-          useConfigFile: true
+        uses: gittools/actions/gitversion/execute@v4.1.0
+
+      - run: |
+          echo "FullSemVer (steps.version_step.outputs.fullSemVer)            : ${{ steps.gitversion.outputs.fullSemVer }}"
+        name: Display GitVersion outputs (step output without prefix)
+
+      - run: |
+          echo "FullSemVer (steps.version_step.outputs) : ${{ steps.gitversion.outputs }}"
+        name: Display GitVersion outputs
 
       - name: Pack all projects
         working-directory: "./examples/NugetPackages"
         run: |
           dotnet pack src/NugetPackages.Alpha/NugetPackages.Alpha.csproj -c Release -o ./artifacts \
-            -p:Version=${{ steps.gitversion.outputs.NuGetVersionV2 }}
+            -p:Version=${{ steps.gitversion.outputs.fullSemVer }}
           dotnet pack src/NugetPackages.Bravo/NugetPackages.Bravo.csproj -c Release -o ./artifacts \
-            -p:Version=${{ steps.gitversion.outputs.NuGetVersionV2 }}
+            -p:Version=${{ steps.gitversion.outputs.fullSemVer }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
