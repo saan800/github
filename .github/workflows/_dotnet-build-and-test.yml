@@ -103,13 +103,13 @@ jobs:
         with:
           dotnet-version: ${{ matrix.dotnet-version }}
 
-      # - name: Cache .NET packages
-      #   uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # 4.2.4
-      #   with:
-      #     path: ~/.nuget/packages # Path to the NuGet package cache
-      #     key: ${{ matrix.os }}-${{ matrix.dotnet-version }}-nuget-${{ hashFiles('**/packages.lock.json') }}
-      #     restore-keys: |
-      #       ${{ matrix.os }}-${{ matrix.dotnet-version }}-nuget-
+      - name: Cache .NET packages
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # 4.2.4
+        with:
+          path: ~/.nuget/packages # Path to the NuGet package cache
+          key: ${{ matrix.os }}-${{ matrix.dotnet-version }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: |
+            ${{ matrix.os }}-${{ matrix.dotnet-version }}-nuget-
 
       - name: Restore packages
         working-directory: ${{ inputs.working-directory }}
