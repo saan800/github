@@ -81,7 +81,7 @@ jobs:
         if: ${{ inputs.upload-to-github }}
         working-directory: ${{ inputs.working-directory }}
         run: >
-          dotnet nuget push ${{ inputs.working-directory }}/build-packages/*.nupkg
+          dotnet nuget push build-packages/*.nupkg
           --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
           --api-key ${{ secrets.GITHUB_ACCESS_TOKEN }}
 
@@ -89,7 +89,7 @@ jobs:
         if: ${{ inputs.upload-to-github }}
         working-directory: ${{ inputs.working-directory }}
         run: >
-          dotnet nuget push ${{ inputs.working-directory }}/build-packages/*.snupkg
+          dotnet nuget push build-packages/*.snupkg
           --skip-duplicate
           --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
           --api-key ${{ secrets.GITHUB_ACCESS_TOKEN }}
@@ -98,6 +98,6 @@ jobs:
         if: ${{ inputs.upload-to-nuget }}
         working-directory: ${{ inputs.working-directory }}
         run: >
-          dotnet nuget push ${{ inputs.working-directory }}/build-packages/*.nupkg
+          dotnet nuget push build-packages/*.nupkg
           --source https://api.nuget.org/v3/index.json
           --api-key ${{ secrets.NUGET_API_KEY }}
