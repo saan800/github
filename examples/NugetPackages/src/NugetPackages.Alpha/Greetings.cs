@@ -7,4 +7,3 @@ public static class Greetings
     /// </summary>
     public static string Hello(string name) => $"Hello, {name}!";
 }
-
