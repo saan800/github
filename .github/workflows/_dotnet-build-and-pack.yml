@@ -93,7 +93,7 @@ jobs:
           dotnet pack
           --no-restore
           --configuration Release
-          --output ${{ inputs.working-directory }}/build-packages
+          --output build-packages
           /p:Version=${{ inputs.package-version }}
 
       - name: Upload artifacts
@@ -101,6 +101,6 @@ jobs:
         with:
           name: ${{ inputs.package-artifact-name }}
           path: |
-            ${{ inputs.working-directory }}/build-packages/**/*.nupkg
-            ${{ inputs.working-directory }}/build-packages/**/*.snupkg
+            ${{ inputs.working-directory }}/build-packages/*.nupkg
+            ${{ inputs.working-directory }}/build-packages/*.snupkg
           if-no-files-found: error
