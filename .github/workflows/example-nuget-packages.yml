@@ -28,60 +28,74 @@ jobs:
       os-list: "ubuntu-latest"
       dotnet-version-list: "9.0.x"
 
-  pack_pr:
-    name: Version, Pack, Publish PR preview
-    runs-on: ubuntu-latest
-    needs: [build-and-test]
-    if: github.event_name == 'pull_request'
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+  get-version:
+    uses: ./.github/workflows/_version.yml
 
-      - uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: "9.0.x"
+  pack:
+    needs:
+      - build-and-test
+      - get-version
+    uses: ./.github/workflows/_dotnet-build-and-pack.yml
+    with:
+      working-directory: "./examples/NugetPackages"
+      package-version: ${{ needs.get-version.outputs.version }}
+      package-artifact-name: "packages"
+      add-assembly-version: false
 
-      - name: Restore packages
-        working-directory: "./examples/NugetPackages"
-        run: dotnet restore --use-lock-file
+  # pack_pr:
+  #   name: Version, Pack, Publish PR preview
+  #   runs-on: ubuntu-latest
+  #   needs: [build-and-test]
+  #   if: github.event_name == 'pull_request'
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 0
 
-      - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@v4.1.0
-        with:
-          versionSpec: "6.3.x"
+  #     - uses: actions/setup-dotnet@v4
+  #       with:
+  #         dotnet-version: "9.0.x"
 
-      - name: Determine version (GitVersion)
-        id: gitversion
-        uses: gittools/actions/gitversion/execute@v4.1.0
+  #     - name: Restore packages
+  #       working-directory: "./examples/NugetPackages"
+  #       run: dotnet restore --use-lock-file
 
-      - run: |
-          echo "FullSemVer (steps.version_step.outputs.fullSemVer)            : ${{ steps.gitversion.outputs.fullSemVer }}"
-        name: Display GitVersion outputs (step output without prefix)
+  #     - name: Install GitVersion
+  #       uses: gittools/actions/gitversion/setup@v4.1.0
+  #       with:
+  #         versionSpec: "6.3.x"
 
-      - run: |
-          echo "FullSemVer (steps.version_step.outputs) : ${{ steps.gitversion.outputs }}"
-        name: Display GitVersion outputs
+  #     - name: Determine version (GitVersion)
+  #       id: gitversion
+  #       uses: gittools/actions/gitversion/execute@v4.1.0
 
-      - name: Pack all projects
-        working-directory: "./examples/NugetPackages"
-        run: |
-          dotnet pack src/NugetPackages.Alpha/NugetPackages.Alpha.csproj -c Release -o ./artifacts \
-            -p:Version=${{ steps.gitversion.outputs.fullSemVer }}
-          dotnet pack src/NugetPackages.Bravo/NugetPackages.Bravo.csproj -c Release -o ./artifacts \
-            -p:Version=${{ steps.gitversion.outputs.fullSemVer }}
+  #     - run: |
+  #         echo "FullSemVer (steps.version_step.outputs.fullSemVer)            : ${{ steps.gitversion.outputs.fullSemVer }}"
+  #       name: Display GitVersion outputs (step output without prefix)
 
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: nuget-packages
-          path: examples/NugetPackages/artifacts/*.nupkg
+  #     - run: |
+  #         echo "FullSemVer (steps.version_step.outputs) : ${{ steps.gitversion.outputs }}"
+  #       name: Display GitVersion outputs
 
-      - name: Publish to GitHub Packages (PR previews)
-        run: |
-          for f in examples/NugetPackages/artifacts/*.nupkg; do
-            dotnet nuget push "$f" \
-              --source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" \
-              --api-key ${{ github.token }} \
-              --skip-duplicate;
-          done
+  #     - name: Pack all projects
+  #       working-directory: "./examples/NugetPackages"
+  #       run: |
+  #         dotnet pack src/NugetPackages.Alpha/NugetPackages.Alpha.csproj -c Release -o ./artifacts \
+  #           -p:Version=${{ steps.gitversion.outputs.fullSemVer }}
+  #         dotnet pack src/NugetPackages.Bravo/NugetPackages.Bravo.csproj -c Release -o ./artifacts \
+  #           -p:Version=${{ steps.gitversion.outputs.fullSemVer }}
+
+  #     - name: Upload artifacts
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: nuget-packages
+  #         path: examples/NugetPackages/artifacts/*.nupkg
+
+  #     - name: Publish to GitHub Packages (PR previews)
+  #       run: |
+  #         for f in examples/NugetPackages/artifacts/*.nupkg; do
+  #           dotnet nuget push "$f" \
+  #             --source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" \
+  #             --api-key ${{ github.token }} \
+  #             --skip-duplicate;
+  #         done
