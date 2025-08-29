@@ -46,6 +46,7 @@ jobs:
           allowed-endpoints: >
             aka.ms:443
             api.nuget.org:443
+            builds.dotnet.microsoft.com:443
             dc.services.visualstudio.com:443
             dotnetcli.azureedge.net:443
             github.com:443
@@ -92,7 +93,7 @@ jobs:
           dotnet pack
           --no-restore
           --configuration Release
-          --output ${{ inputs.working-directory }}/build-packages
+          --output build-packages
           /p:Version=${{ inputs.package-version }}
 
       - name: Upload artifacts
