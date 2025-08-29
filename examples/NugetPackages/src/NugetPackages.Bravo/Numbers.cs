@@ -1,4 +1,4 @@
-﻿namespace NugetPackages.Bravo;
+namespace NugetPackages.Bravo;
 
 public static class Numbers
 {

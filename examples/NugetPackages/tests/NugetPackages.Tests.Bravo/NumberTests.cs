@@ -1,4 +1,4 @@
-﻿using NugetPackages.Bravo;
+using NugetPackages.Bravo;
 
 namespace NugetPackages.Tests.Bravo;
 

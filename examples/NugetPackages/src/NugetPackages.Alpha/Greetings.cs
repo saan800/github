@@ -1,4 +1,4 @@
-﻿namespace NugetPackages.Alpha;
+namespace NugetPackages.Alpha;
 
 public static class Greetings
 {

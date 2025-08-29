@@ -1,4 +1,4 @@
-﻿using NugetPackages.Alpha;
+using NugetPackages.Alpha;
 
 namespace NugetPackages.Tests.Alpha;
 
