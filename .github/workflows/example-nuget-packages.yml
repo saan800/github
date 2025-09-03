@@ -52,6 +52,6 @@ jobs:
       working-directory: "./examples/NugetPackages"
       package-artifact-name: "packages"
       upload-to-github: true
-      upload-to-nuget: true
+      upload-to-nuget: false
     secrets:
       GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
