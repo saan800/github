@@ -1,0 +1,26 @@
+name: example-nuget-packages
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  ci-cd:
+    permissions:
+      contents: write
+      packages: write
+    uses: ./.github/workflows/_dotnet-build-test-pack-publish.yml
+    with:
+      working-directory: "./examples/NugetPackages"
+      os: ubuntu-latest
+      dotnet-version: 9.0.x
+      is-release: false
+      #is-release: ${{ github.ref == 'refs/heads/main' }}
+    secrets:
+      GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}

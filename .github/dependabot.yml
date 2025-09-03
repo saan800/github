@@ -49,6 +49,7 @@ updates:
       microsoft:
         patterns:
           - "Microsoft.*"
+        update-types: ["minor", "patch"]
       testing:
         patterns:
           - "AwesomeAssertions*"
@@ -56,6 +57,40 @@ updates:
           - "FakeItEasy*"
           - "GitHubActionsTestLogger"
           - "xunit*"
+        update-types: ["minor", "patch"]
       other-packages:
         patterns:
           - "Scalar.AspNetCore*"
+        update-types: ["minor", "patch"]
+
+  - package-ecosystem: "nuget"
+    directory: "/examples/NugetPackages"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "dependencies(nuget): "
+    labels:
+      - "dependencies"
+    open-pull-requests-limit: 5
+    allow:
+      - dependency-type: direct
+      - dependency-type: indirect
+    # Force lock file regeneration
+    rebase-strategy: auto
+    groups:
+      microsoft:
+        patterns:
+          - "Microsoft.*"
+        update-types: ["minor", "patch"]
+      testing:
+        patterns:
+          - "AwesomeAssertions*"
+          - "coverlet*"
+          - "FakeItEasy*"
+          - "GitHubActionsTestLogger"
+          - "xunit*"
+        update-types: ["minor", "patch"]
+      other-packages:
+        patterns:
+          - "Scalar.AspNetCore*"
+        update-types: ["minor", "patch"]
