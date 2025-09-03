@@ -8,16 +8,6 @@ on:
         required: false
         type: string
         default: "."
-      os-list:
-        description: A comma separated list of operating system(s) to run the build and test jobs on. e.g. "ubuntu-latest, windows-latest". Other jobs use the 'os' input.
-        required: false
-        type: string
-        default: ubuntu-latest
-      dotnet-version-list:
-        description: A comma separated list of dotnet version(s) to run the build and test jobs on. e.g. "7.0.x, 8.0.x, 9.0.x,". Other jobs use the 'dotnet-version' input.
-        required: false
-        type: string
-        default: 9.0.x
       os:
         description: The operating system to run non-matrix jobs on. e.g. "ubuntu-latest" or "windows-latest".
         required: false
@@ -60,8 +50,8 @@ jobs:
     uses: ./.github/workflows/_dotnet-build-and-test.yml
     with:
       working-directory: ${{ inputs.working-directory }}
-      os-list: ${{ inputs.os-list }}
-      dotnet-version-list: ${{ inputs.dotnet-version-list }}
+      os: ${{ inputs.os }}
+      dotnet-version: ${{ inputs.dotnet-version }}
       codecov-slug: ${{ inputs.codecov-slug }}
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
