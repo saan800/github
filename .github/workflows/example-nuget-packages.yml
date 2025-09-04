@@ -19,6 +19,7 @@ jobs:
     with:
       working-directory: "./examples/NugetPackages"
       os: ubuntu-latest
+      dotnet-version-matrix: '[{ "dotnet-version": "9.0.x", "framework": "net9.0" }]'
       dotnet-version: 9.0.x
       is-release: false
       #is-release: ${{ github.ref == 'refs/heads/main' }}
