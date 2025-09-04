@@ -11,7 +11,7 @@ label-for-breaking-changes: "breaking"
 label-mapping:
   breaking:
     ["breaking", "BREAKING CHANGE", "breaking change", "breaking changes"]
-  bug: ["fix"]
+  bug: ["fix", "bug", "hotfix", "bugfix"]
   documentation: ["docs"]
   feature: ["feat", "feature"]
   dependencies: ["dependencies"]
