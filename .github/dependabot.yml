@@ -8,7 +8,7 @@ updates:
       time: "18:30"
       timezone: "Australia/Perth"
     commit-message:
-      prefix: "dependencies(github-actions): "
+      prefix: "chore(github-actions): "
     labels:
       - "dependencies"
     open-pull-requests-limit: 10
