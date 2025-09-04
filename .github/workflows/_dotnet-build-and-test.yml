@@ -51,10 +51,12 @@ jobs:
             json="[ { \"dotnet-version\": \"${{ inputs.dotnet-version }}\", \"framework\": \"\" } ]"
             echo "matrix=$json" >> $GITHUB_OUTPUT
           fi
-      - name: Print resulting matrix JSON
+      - name: Print raw matrix JSON
         run: |
-          echo "Matrix JSON string: ${{ steps.set-matrix.outputs.matrix }}"
-          echo "Matrix JSON object: ${{ fromJSON(steps.set-matrix.outputs.matrix) }}"
+          echo "${{ steps.set-matrix.outputs.matrix }}"
+      - name: Print fromJSON evaluation
+        run: |
+          echo '${{ toJSON(fromJSON(steps.set-matrix.outputs.matrix)) }}' | jq .
 
 
   dotnet-build-and-test:
