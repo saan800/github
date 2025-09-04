@@ -59,7 +59,8 @@ jobs:
     needs: prepare-matrix
     runs-on: ${{ inputs.os }}
     strategy:
-      matrix: ${{ fromJSON(needs.prepare-matrix.outputs.matrix) }}
+      matrix:
+        include: ${{ fromJSON(needs.prepare-matrix.outputs.matrix) }}
       fail-fast: false
 
     steps:
