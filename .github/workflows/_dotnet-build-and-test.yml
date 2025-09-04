@@ -51,10 +51,11 @@ jobs:
       - id: set-matrix
         shell: bash
         run: |
-          if [ -n "${{ inputs.dotnet-version-matrix }}" ]; then
-            printf 'matrix=%s\n' "${{ inputs.dotnet-version-matrix }}" >> $GITHUB_OUTPUT
+          if [ -n '${{ inputs.dotnet-version-matrix }}' ]; then
+            printf 'matrix=%s\n' '${{ inputs.dotnet-version-matrix }}' >> $GITHUB_OUTPUT
           else
             printf 'matrix=%s\n' "[{\"dotnet-version\":\"${{ inputs.dotnet-version }}\",\"framework\":\"\"}]" >> $GITHUB_OUTPUT
+          fi
 
       - name: Print raw matrix JSON
         run: |
