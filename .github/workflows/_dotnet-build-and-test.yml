@@ -45,19 +45,15 @@ jobs:
     steps:
       - id: set-matrix
         run: |
-          # If matrix input is provided, use it
           if [ -n "${{ inputs.dotnet-version-matrix }}" ]; then
             echo "matrix=${{ inputs.dotnet-version-matrix }}" >> $GITHUB_OUTPUT
           else
-            # Build a single-entry JSON matrix from dotnet-version
             json="[ { \"dotnet-version\": \"${{ inputs.dotnet-version }}\", \"framework\": \"\" } ]"
             echo "matrix=$json" >> $GITHUB_OUTPUT
-
       - name: Print raw matrix JSON
         run: |
           echo "Raw JSON string:"
           echo "${{ steps.set-matrix.outputs.matrix }}" | jq .
-
       - name: Print evaluated fromJSON object
         run: |
           echo "Evaluated fromJSON object:"
