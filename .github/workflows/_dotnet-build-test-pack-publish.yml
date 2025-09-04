@@ -13,8 +13,12 @@ on:
         required: false
         type: string
         default: ubuntu-latest
+      dotnet-version-matrix:
+        description: 'JSON array of dotnet-version/framework pairs, used for testing. eg ''[{ "dotnet-version": "8.0.x", "framework": "net8.0" }, { "dotnet-version": "9.0.x", "framework": "net9.0" }]'''
+        required: false
+        type: string
       dotnet-version:
-        description: The dotnet version to run the non-matrix jobs on. e.g. "9.0.x".
+        description: The dotnet version to run the non-matrix jobs with. e.g. "9.0.x".
         required: false
         type: string
         default: 9.0.x
@@ -51,6 +55,7 @@ jobs:
     with:
       working-directory: ${{ inputs.working-directory }}
       os: ${{ inputs.os }}
+      dotnet-version-matrix: ${{ inputs.dotnet-version-matrix }}
       dotnet-version: ${{ inputs.dotnet-version }}
       codecov-slug: ${{ inputs.codecov-slug }}
     secrets:
