@@ -53,7 +53,9 @@ jobs:
           fi
       - name: Print resulting matrix JSON
         run: |
-          echo "Matrix JSON: ${{ steps.set-matrix.outputs.matrix }}"
+          echo "Matrix JSON string: ${{ steps.set-matrix.outputs.matrix }}"
+          echo "Matrix JSON object: ${{ fromJSON(steps.set-matrix.outputs.matrix) }}"
+
 
   dotnet-build-and-test:
     needs: prepare-matrix
