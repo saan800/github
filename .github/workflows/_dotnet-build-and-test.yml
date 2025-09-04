@@ -12,7 +12,12 @@ on:
         required: false
         type: string
         default: ubuntu-latest
+      dotnet-version-matrix:
+        description: 'JSON array of dotnet-version/framework pairs. eg ''[{ "dotnet-version": "8.0.x", "framework": "net8.0" }, { "dotnet-version": "9.0.x", "framework": "net9.0" }]'''
+        required: false
+        type: string
       dotnet-version:
+        description: "Dotnet SDK version to use if no matrix is provided"
         required: false
         type: string
         default: 9.0.x
@@ -33,8 +38,26 @@ permissions:
   contents: read
 
 jobs:
+  prepare-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - id: set-matrix
+        run: |
+          if [ -n "${{ inputs.dotnet-version-matrix }}" ]; then
+            echo "matrix=${{ inputs.dotnet-version-matrix }}" >> $GITHUB_OUTPUT
+          else
+            json="[ { \"dotnet-version\": \"${{ inputs.dotnet-version }}\", \"framework\": \"\" } ]"
+            echo "matrix=$json" >> $GITHUB_OUTPUT
+          fi
+
   dotnet-build-and-test:
+    needs: prepare-matrix
     runs-on: ${{ inputs.os }}
+    strategy:
+      matrix: ${{ fromJSON(needs.prepare-matrix.outputs.matrix) }}
+      fail-fast: false
 
     steps:
       - name: Harden Runner
@@ -58,18 +81,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
-      - name: Setup .NET SDK ${{ inputs.dotnet-version }}
+      - name: Setup .NET SDK ${{ matrix.dotnet-version }}
         uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4.3.1
         with:
-          dotnet-version: ${{ inputs.dotnet-version }}
+          dotnet-version: ${{ matrix.dotnet-version }}
 
       - name: Cache .NET packages
         uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # 4.2.4
         with:
           path: ~/.nuget/packages # Path to the NuGet package cache
-          key: ${{ inputs.os }}-${{ inputs.dotnet-version }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          key: ${{ inputs.os }}-${{ matrix.dotnet-version }}-nuget-${{ hashFiles('**/packages.lock.json') }}
           restore-keys: |
-            ${{ inputs.os }}-${{ inputs.dotnet-version }}-nuget-
+            ${{ inputs.os }}-${{ matrix.dotnet-version }}-nuget-
 
       - name: Restore packages
         working-directory: ${{ inputs.working-directory }}
@@ -97,14 +120,20 @@ jobs:
 
       - name: Run unit tests
         working-directory: ${{ inputs.working-directory }}
-        run: >
-          dotnet test
-          --no-restore
-          --configuration Release
-          --logger "GitHubActions;summary.includePassedTests=true;summary.includeSkippedTests=true;annotations.titleFormat=@test;annotations.messageFormat=@error\n@trace"
-          /p:CollectCoverage=true
-          --
-          RunConfiguration.CollectSourceInformation=true
+        # run: >
+        #   dotnet test
+        #   --no-restore
+        #   --configuration Release
+        #   --logger "GitHubActions;summary.includePassedTests=true;summary.includeSkippedTests=true;annotations.titleFormat=@test;annotations.messageFormat=@error\n@trace"
+        #   /p:CollectCoverage=true
+        #   --
+        #   RunConfiguration.CollectSourceInformation=true
+        run: |
+          if [ -n "${{ matrix.framework }}" ]; then
+            dotnet test --no-build --configuration Release --framework ${{ matrix.framework }} --logger "GitHubActions;summary.includePassedTests=true;summary.includeSkippedTests=true;annotations.titleFormat=@test;annotations.messageFormat=@error\n@trace" /p:CollectCoverage=true
+          else
+            dotnet test --no-build --configuration Release --logger "GitHubActions;summary.includePassedTests=true;summary.includeSkippedTests=true;annotations.titleFormat=@test;annotations.messageFormat=@error\n@trace" /p:CollectCoverage=true
+          fi
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@fdcc8476540edceab3de004e990f80d881c6cc00 # v5.5.0
@@ -113,5 +142,5 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: ./reports/coverage/
           fail_ci_if_error: false
-          flags: ${{ inputs.codecov-flag }}, ${{ inputs.dotnet-version }}, ${{ inputs.os }}
+          flags: ${{ inputs.codecov-flag }}, ${{ matrix.dotnet-version }}, ${{ inputs.os }}
           slug: ${{ inputs.codecov-slug }}
