@@ -54,8 +54,8 @@ jobs:
           # Strip newlines and leading/trailing whitespace
           cleaned_matrix=$(echo '${{ inputs.dotnet-version-matrix }}' | tr -d '\n' | xargs)
 
-          if [ -n '$cleaned_matrix' ]; then
-            printf 'matrix=%s\n' '$cleaned_matrix' >> $GITHUB_OUTPUT
+          if [ -n "$cleaned_matrix" ]; then
+            printf 'matrix=%s\n' "$cleaned_matrix" >> $GITHUB_OUTPUT
           else
             printf 'matrix=%s\n' "[{\"dotnet-version\":\"${{ inputs.dotnet-version }}\",\"framework\":\"\"}]" >> $GITHUB_OUTPUT
           fi
