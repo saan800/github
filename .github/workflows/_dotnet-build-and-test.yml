@@ -60,7 +60,7 @@ jobs:
       - name: Print raw matrix JSON
         run: |
           echo "Raw matrix JSON string:"
-          echo "${{ steps.set-matrix.outputs.matrix }}" | jq .
+          echo "${{ steps.set-matrix.outputs.matrix }}"
 
       - name: Print evaluated fromJSON object
         run: |
