@@ -45,10 +45,8 @@ jobs:
     steps:
       - name: Print raw inputs
         run: |
-          echo "Dotnet Version Matrix:"
-          echo "${{ inputs.dotnet-version-matrix }}"
-          echo "Dotnet Version:"
-          echo "${{ inputs.dotnet-version }}"
+          echo "Raw input: dotnet-version-matrix='${{ inputs.dotnet-version-matrix }}'"
+          echo "Raw input: dotnet-version='${{ inputs.dotnet-version }}'"
 
       - id: set-matrix
         shell: bash
@@ -58,10 +56,9 @@ jobs:
           else
             printf 'matrix=%s\n' "[{\"dotnet-version\":\"${{ inputs.dotnet-version }}\",\"framework\":\"\"}]" >> $GITHUB_OUTPUT
 
-
       - name: Print raw matrix JSON
         run: |
-          echo "Raw JSON string:"
+          echo "Raw matrix JSON string:"
           echo "${{ steps.set-matrix.outputs.matrix }}" | jq .
 
       - name: Print evaluated fromJSON object
