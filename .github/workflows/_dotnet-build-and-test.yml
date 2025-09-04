@@ -46,9 +46,9 @@ jobs:
       - name: Print raw inputs
         run: |
           echo "Dotnet Version Matrix:"
-          echo "${{ inputs.dotnet-version-matrix }}" | jq .
+          echo "${{ inputs.dotnet-version-matrix }}"
           echo "Dotnet Version:"
-          echo "${{ inputs.dotnet-version }}" | jq .
+          echo "${{ inputs.dotnet-version }}"
 
       - id: set-matrix
         run: |
