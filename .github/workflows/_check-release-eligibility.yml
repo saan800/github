@@ -46,14 +46,14 @@ jobs:
             should_release=true
           elif [ "$IS_RELEASE_BRANCH" = "true" ]; then
             # Get last tag
-            LAST_TAG=$(gh api repos/$REPO/tags --jq '.[0].name' --silent)
+            LAST_TAG=$(gh api repos/$REPO/tags --jq '.[0].name')
 
             if [ -n "$LAST_TAG" ]; then
               # Get commits between last tag and current SHA
-              COMMITS=$(gh api repos/$REPO/compare/$LAST_TAG...$SHA --jq '.commits[].commit.message' --silent)
+              COMMITS=$(gh api repos/$REPO/compare/$LAST_TAG...$SHA --jq '.commits[].commit.message')
             else
               # No previous tag, consider all commits
-              COMMITS=$(gh api repos/$REPO/commits?sha=$SHA --jq '.[].commit.message' --silent)
+              COMMITS=$(gh api repos/$REPO/commits?sha=$SHA --jq '.[].commit.message')
             fi
 
             # Extract PR numbers
@@ -61,7 +61,7 @@ jobs:
 
             # Check labels of each PR
             for pr in $PRS; do
-              LABELS=$(gh api repos/$REPO/pulls/$pr --jq '.labels[].name' --silent)
+              LABELS=$(gh api repos/$REPO/pulls/$pr --jq '.labels[].name')
               if ! echo "$LABELS" | grep -q "no-release"; then
                 should_release=true
                 break

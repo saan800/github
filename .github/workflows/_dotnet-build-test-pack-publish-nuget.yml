@@ -58,6 +58,8 @@ permissions:
 jobs:
   get-version:
     uses: ./.github/workflows/_version.yml
+    with:
+      is-release-branch: ${{ inputs.is-release-branch }}
 
   check-release-eligibility:
     uses: ./.github/workflows/_check-release-eligibility.yml

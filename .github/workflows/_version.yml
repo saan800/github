@@ -12,6 +12,10 @@ on:
         required: false
         type: string
         default: "version"
+      is-release-branch:
+        description: 'If its a release branch or not. eg release from main check would be "github.ref==''refs/heads/main''" '
+        type: boolean
+        required: true
     outputs:
       version:
         description: The new version number
@@ -41,12 +45,24 @@ jobs:
       - name: Checkout
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
+      - name: Determine release branch name
+        id: release-branch
+        run: |
+          release_branch="main"
+          if [ "${GITHUB_REF_NAME}" = "main" ] && [ "${{ inputs.is-release-branch }}" != "true" ]; then
+            release_branch="not-main-release"
+          fi
+
+          echo "release-branch-name=$release_branch" >> $GITHUB_OUTPUT
+          echo "Release branch name set to: $release_branch"
+
       - name: Get version
         uses: reecetech/version-increment@a29aa752dc3b8118a2dc2ed93faf0e95a73a9c7e # 2024.10.1
         id: get-version
         with:
           scheme: conventional_commits
           increment: patch
+          release_branch: ${{ steps.release-branch.outputs.release-branch-name }}
 
       - name: Current version
         run: echo "${{ steps.get-version.outputs.current-version }}"
