@@ -21,6 +21,11 @@ on:
         required: false
         type: string
         default: "packages"
+      num-github-prerelease-packages-to-keep:
+        description: "We cleanup github prerelease nuget packages. Configure how many to keep"
+        type: number
+        required: false
+        default: 50
       upload-to-github:
         description: "Upload pacakge to github package registry"
         type: boolean
@@ -41,6 +46,7 @@ on:
 
 permissions:
   contents: read
+  packages: write
 
 jobs:
   publish-nuget-package:
@@ -101,3 +107,58 @@ jobs:
           dotnet nuget push build-packages/*.nupkg
           --source https://api.nuget.org/v3/index.json
           --api-key ${{ secrets.NUGET_API_KEY }}
+
+  discover-packages:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
+        with:
+          disable-sudo: true
+          egress-policy: block
+          allowed-endpoints: >
+            aka.ms:443
+            api.codecov.io:443
+            api.nuget.org:443
+            builds.dotnet.microsoft.com:443
+            ci.dot.net:443
+            cli.codecov.io:443
+            crl3.digicert.com:80
+            dc.services.visualstudio.com:443
+            dotnetcli.azureedge.net:443
+            github.com:443
+            storage.googleapis.com:443
+
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - name: Find package IDs
+        id: set-matrix
+        run: |
+          # extract all <PackageId> from csproj files, or fallback to project name if none
+          packages=$(grep -hoP '(?<=<PackageId>).*?(?=</PackageId>)' **/*.csproj | sort -u)
+
+          if [ -z "$packages" ]; then
+            echo "No <PackageId> found, falling back to project names"
+            packages=$(basename -s .csproj $(ls **/*.csproj))
+          fi
+
+          # convert to JSON array
+          json=$(jq -nc --argjson arr "$(printf '%s\n' $packages | jq -R . | jq -s .)" '{"package": $arr}')
+          echo "matrix=$json" >> $GITHUB_OUTPUT
+
+  cleanup:
+    needs: discover-packages
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{ fromJson(needs.discover-packages.outputs.matrix) }}
+    steps:
+      - name: Delete old versions for ${{ matrix.package }}
+        uses: actions/delete-package-versions@v5
+        with:
+          package-name: ${{ matrix.package }}
+          package-type: nuget
+          min-versions-to-keep: ${{ inputs.num-github-prerelease-packages-to-keep }}
+          delete-only-pre-release-versions: true

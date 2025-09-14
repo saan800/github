@@ -22,6 +22,11 @@ on:
         required: false
         type: string
         default: 9.0.x
+      num-github-prerelease-packages-to-keep:
+        description: "We cleanup github prerelease nuget packages. Configure how many to keep"
+        type: number
+        required: false
+        default: 50
       codecov-slug:
         description: "Slug to upload code coverage results for Codecov. e.g. saan800/saansoft-correlationId"
         required: false
@@ -109,6 +114,7 @@ jobs:
       os: ${{ inputs.os }}
       dotnet-version: ${{ inputs.dotnet-version }}
       package-artifact-name: "packages"
+      num-github-prerelease-packages-to-keep: ${{ inputs.num-github-prerelease-packages-to-keep }}
       upload-to-github: ${{ inputs.is-release-branch == false && needs.check-release-eligibility.outputs.should-release == 'false' }}
       upload-to-nuget: ${{ needs.check-release-eligibility.outputs.should-release == 'true' }}
     secrets:
