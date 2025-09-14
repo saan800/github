@@ -30,6 +30,7 @@ jobs:
       dotnet-version: 9.0.x
       is-release-branch: false
       #is-release-branch: ${{ github.ref == 'refs/heads/main' }}
-      force-release: ${{ inputs.force-release }}
+      #force-release: ${{ inputs.force-release }}
+      force-release:: false
     secrets:
       GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
