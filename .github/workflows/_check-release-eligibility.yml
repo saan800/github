@@ -29,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     if: inputs.is-release-branch || inputs.force-release
     outputs:
-      should-release: ${{ steps.set-output.output.should-release }}
+      should-release: ${{ steps.set-output.outputs.should-release }}
     steps:
       - name: Force release override
         id: force
