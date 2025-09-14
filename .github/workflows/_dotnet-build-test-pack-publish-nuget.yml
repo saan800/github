@@ -94,6 +94,21 @@ jobs:
       package-artifact-name: "packages"
       add-assembly-version: ${{ inputs.is-release-branch }}
 
+  temp:
+    runs-on: ubuntu-latest
+    needs:
+      - pack
+      - check-release-eligibility
+    steps:
+      - name: check values
+        id: check_values
+        run: |
+          echo "is-release-branch value: ${{ inputs.is-release-branch }}"
+          echo "is-release-branch eval: ${{ inputs.is-release-branch == false }}"
+          echo "should-release value: ${{ needs.check-release-eligibility.outputs.should-release }}"
+          echo "should-release eval: ${{ needs.check-release-eligibility.outputs.should-release == 'false' }}"
+          echo "upload-to-github: ${{ inputs.is-release-branch == false && needs.check-release-eligibility.outputs.should-release == 'false' }}"
+
   publish:
     needs:
       - pack

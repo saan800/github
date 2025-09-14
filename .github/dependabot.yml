@@ -11,6 +11,7 @@ updates:
       prefix: "chore(github-actions): "
     labels:
       - "dependencies"
+      - "no-release"
     open-pull-requests-limit: 10
     rebase-strategy: auto
     groups:
@@ -58,10 +59,6 @@ updates:
           - "GitHubActionsTestLogger"
           - "xunit*"
         update-types: ["minor", "patch"]
-      other-packages:
-        patterns:
-          - "Scalar.AspNetCore*"
-        update-types: ["minor", "patch"]
 
   - package-ecosystem: "nuget"
     directory: "/examples/NugetPackages"
@@ -89,8 +86,4 @@ updates:
           - "FakeItEasy*"
           - "GitHubActionsTestLogger"
           - "xunit*"
-        update-types: ["minor", "patch"]
-      other-packages:
-        patterns:
-          - "Scalar.AspNetCore*"
         update-types: ["minor", "patch"]
