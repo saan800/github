@@ -59,8 +59,6 @@ updates:
           - "GitHubActionsTestLogger"
           - "xunit*"
         update-types: ["minor", "patch"]
-        labels:
-          - "no-release"
 
   - package-ecosystem: "nuget"
     directory: "/examples/NugetPackages"
@@ -89,5 +87,3 @@ updates:
           - "GitHubActionsTestLogger"
           - "xunit*"
         update-types: ["minor", "patch"]
-        labels:
-          - "no-release"
