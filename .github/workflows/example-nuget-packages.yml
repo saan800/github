@@ -5,7 +5,7 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:   # 👈 allow manual trigger here too
+  workflow_dispatch: # 👈 manual trigger here to release
     inputs:
       force-release:
         description: "Force a release regardless of PR labels"
@@ -31,6 +31,6 @@ jobs:
       dotnet-version-matrix: '[{ "dotnet-version": "9.0.x", "framework": "net9.0" }]'
       dotnet-version: 9.0.x
       is-release-branch: false   # ${{ github.ref == 'refs/heads/main' }}
-      force-release: ${{ inputs.force-release }}
+      force-release: ${{ github.event.inputs.force-release || false }}
     secrets:
       GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
