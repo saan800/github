@@ -53,6 +53,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: read
 
 jobs:
   get-version:
@@ -60,6 +61,8 @@ jobs:
 
   check-release-eligibility:
     uses: ./.github/workflows/_check-release-eligibility.yml
+    permissions:
+      pull-requests: read
     with:
       is-release-branch: ${{ inputs.is-release-branch }}
       force-release: ${{ inputs.force-release }}
