@@ -1,0 +1,87 @@
+name: check-release-eligibility
+
+on:
+  workflow_call:
+    inputs:
+      is-release-branch:
+        description: "If its a release branch or not. eg main would be is-release-branch=true"
+        type: boolean
+        required: true
+      force-release:
+        description: "Force a release regardless of PR labels"
+        type: boolean
+        required: false
+        default: false
+    secrets:
+      GITHUB_ACCESS_TOKEN:
+        description: "(ie: GITHUB_TOKEN) GitHub token"
+        required: true
+    outputs:
+      should-release:
+        description: If should release or not
+        value: ${{ jobs.check-release-eligibility.should-release }}
+
+permissions:
+  contents: read
+
+jobs:
+  check-release-eligibility:
+    runs-on: ubuntu-latest
+    if: inputs.is-release-branch || inputs.force-release
+    outputs:
+      should-release: ${{ steps.set-output.outputs.should-release }}
+    steps:
+      - name: Force release override
+        id: force
+        if: inputs.force-release == true
+        run: echo "should-release=true" >> $GITHUB_OUTPUT
+
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        if: steps.force.outcome != 'success'
+
+      - name: Get last release tag
+        id: last-tag
+        if: steps.force.outcome != 'success'
+        run: |
+          git fetch --tags
+          echo "tag=$(git describe --tags --abbrev=0 || echo '')" >> $GITHUB_OUTPUT
+
+      - name: Get merged PRs since last tag
+        id: prs
+        if: steps.force.outcome != 'success'
+        run: |
+          if [ -z "${{ steps.last-tag.outputs.tag }}" ]; then
+            range=""
+          else
+            range="${{ steps.last-tag.outputs.tag }}..HEAD"
+          fi
+
+          prs=$(git log $range --pretty=format:'%s' | grep -oE '#[0-9]+' | sort -u | tr -d '#')
+          echo "prs=$prs" >> $GITHUB_OUTPUT
+
+      - name: Check PR labels
+        id: check
+        if: steps.force.outcome != 'success'
+        run: |
+          should_release=false
+          if [ -n "${{ steps.prs.outputs.prs }}" ]; then
+            for pr in ${{ steps.prs.outputs.prs }}; do
+              labels=$(gh pr view $pr --json labels --jq '.labels[].name')
+              if ! echo "$labels" | grep -q "no-release"; then
+                should_release=true
+                break
+              fi
+            done
+          fi
+          echo "should-release=$should_release" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+
+      - id: set-output
+        run: |
+          if [ "${{ steps.force.outputs.should-release }}" == "true" ]; then
+            echo "should-release=true" >> $GITHUB_OUTPUT
+          else
+            echo "should-release=${{ steps.check.outputs.should-release }}" >> $GITHUB_OUTPUT
+          fi
