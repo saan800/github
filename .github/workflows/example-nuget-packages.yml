@@ -30,9 +30,7 @@ jobs:
       os: ubuntu-latest
       dotnet-version-matrix: '[{ "dotnet-version": "9.0.x", "framework": "net9.0" }]'
       dotnet-version: 9.0.x
-      is-release-branch: false
-      #is-release-branch: ${{ github.ref == 'refs/heads/main' }}
-      #force-release: ${{ inputs.force-release }}
-      force-release: false
+      is-release-branch: false   # ${{ github.ref == 'refs/heads/main' }}
+      force-release: ${{ inputs.force-release }}
     secrets:
       GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
