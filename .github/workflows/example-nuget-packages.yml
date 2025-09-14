@@ -16,12 +16,14 @@ on:
 permissions:
   contents: read
   packages: write
+  pull-requests: read
 
 jobs:
   ci-cd:
     permissions:
       contents: write
       packages: write
+      pull-requests: read
     uses: ./.github/workflows/_dotnet-build-test-pack-publish-nuget.yml
     with:
       working-directory: "./examples/NugetPackages"
