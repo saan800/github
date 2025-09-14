@@ -62,7 +62,7 @@ jobs:
         with:
           scheme: conventional_commits
           increment: patch
-          release-branch: ${{ steps.release-branch.outputs.release-branch-name }}
+          release_branch: ${{ steps.release-branch.outputs.release-branch-name }}
 
       - name: Current version
         run: echo "${{ steps.get-version.outputs.current-version }}"
