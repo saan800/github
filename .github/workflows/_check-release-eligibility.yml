@@ -1,0 +1,72 @@
+name: check-release-eligibility
+
+on:
+  workflow_call:
+    inputs:
+      is-release-branch:
+        description: "If this is a release branch (e.g., main)"
+        type: boolean
+        required: true
+      force-release:
+        description: "Force a release regardless of PR labels"
+        type: boolean
+        required: false
+        default: false
+    secrets:
+      GITHUB_ACCESS_TOKEN:
+        description: "GitHub token"
+        required: true
+    outputs:
+      should-release:
+        description: "Boolean indicating if release should happen"
+        value: ${{ jobs.check-release-eligibility.outputs.should-release }}
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  check-release-eligibility:
+    runs-on: ubuntu-latest
+    outputs:
+      should-release: ${{ steps.set-output.outputs.should-release }}
+    steps:
+      - name: Determine release eligibility
+        id: set-output
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
+          IS_RELEASE_BRANCH: ${{ inputs.is-release-branch }}
+          FORCE_RELEASE: ${{ inputs.force-release }}
+        run: |
+          should_release=false
+
+          if [ "$FORCE_RELEASE" = "true" ]; then
+            should_release=true
+          elif [ "$IS_RELEASE_BRANCH" = "true" ]; then
+            # Get last tag
+            LAST_TAG=$(gh api repos/$REPO/tags --jq '.[0].name' --silent)
+
+            if [ -n "$LAST_TAG" ]; then
+              # Get commits between last tag and current SHA
+              COMMITS=$(gh api repos/$REPO/compare/$LAST_TAG...$SHA --jq '.commits[].commit.message' --silent)
+            else
+              # No previous tag, consider all commits
+              COMMITS=$(gh api repos/$REPO/commits?sha=$SHA --jq '.[].commit.message' --silent)
+            fi
+
+            # Extract PR numbers
+            PRS=$(echo "$COMMITS" | grep -oE '#[0-9]+' | sort -u | tr -d '#')
+
+            # Check labels of each PR
+            for pr in $PRS; do
+              LABELS=$(gh api repos/$REPO/pulls/$pr --jq '.labels[].name' --silent)
+              if ! echo "$LABELS" | grep -q "no-release"; then
+                should_release=true
+                break
+              fi
+            done
+          fi
+
+          echo "should-release=$should_release" >> $GITHUB_OUTPUT
