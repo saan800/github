@@ -1,4 +1,4 @@
-name: dotnet-build-test-pack-publish
+name: dotnet-build-test-pack-publish-nuget
 
 on:
   workflow_call:
@@ -97,7 +97,7 @@ jobs:
     permissions:
       contents: read
       packages: write
-    uses: ./.github/workflows/_dotnet-publish-package.yml
+    uses: ./.github/workflows/_dotnet-publish-nuget.yml
     with:
       working-directory: ${{ inputs.working-directory }}
       os: ${{ inputs.os }}

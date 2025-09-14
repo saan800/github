@@ -22,7 +22,7 @@ jobs:
     permissions:
       contents: write
       packages: write
-    uses: ./.github/workflows/_dotnet-build-test-pack-publish.yml
+    uses: ./.github/workflows/_dotnet-build-test-pack-publish-nuget.yml
     with:
       working-directory: "./examples/NugetPackages"
       os: ubuntu-latest
