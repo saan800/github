@@ -95,6 +95,7 @@ jobs:
       add-assembly-version: ${{ inputs.is-release-branch }}
 
   temp:
+    runs-on: ubuntu-latest
     needs:
       - pack
       - check-release-eligibility
