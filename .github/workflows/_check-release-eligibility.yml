@@ -22,7 +22,6 @@ on:
         value: ${{ jobs.check-release-eligibility.outputs.should-release }}
 
 permissions:
-  contents: read
   pull-requests: read
 
 jobs:
