@@ -32,7 +32,7 @@ on:
         type: string
         default: unittests
       is-release-branch:
-        description: "If its a release branch or not. eg main would be is-release-branch=true"
+        description: 'If its a release branch or not. eg release from main check would be "github.ref==''refs/heads/main''" '
         type: boolean
         required: true
       force-release:
@@ -55,17 +55,6 @@ permissions:
   contents: read
 
 jobs:
-  build-and-test:
-    uses: ./.github/workflows/_dotnet-build-and-test.yml
-    with:
-      working-directory: ${{ inputs.working-directory }}
-      os: ${{ inputs.os }}
-      dotnet-version-matrix: ${{ inputs.dotnet-version-matrix }}
-      dotnet-version: ${{ inputs.dotnet-version }}
-      codecov-slug: ${{ inputs.codecov-slug }}
-    secrets:
-      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
   get-version:
     uses: ./.github/workflows/_version.yml
 
@@ -76,6 +65,17 @@ jobs:
       force-release: ${{ inputs.force-release }}
     secrets:
       GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+
+  build-and-test:
+    uses: ./.github/workflows/_dotnet-build-and-test.yml
+    with:
+      working-directory: ${{ inputs.working-directory }}
+      os: ${{ inputs.os }}
+      dotnet-version-matrix: ${{ inputs.dotnet-version-matrix }}
+      dotnet-version: ${{ inputs.dotnet-version }}
+      codecov-slug: ${{ inputs.codecov-slug }}
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   pack:
     needs:
@@ -94,7 +94,6 @@ jobs:
     needs:
       - pack
       - check-release-eligibility
-    if: needs.check-release-eligibility.outputs.should-release == 'true'
     permissions:
       contents: read
       packages: write
@@ -104,8 +103,8 @@ jobs:
       os: ${{ inputs.os }}
       dotnet-version: ${{ inputs.dotnet-version }}
       package-artifact-name: "packages"
-      upload-to-github: ${{ !inputs.is-release-branch }}
-      upload-to-nuget: ${{ inputs.is-release-branch }}
+      upload-to-github: ${{ !inputs.is-release-branch && needs.check-release-eligibility.outputs.should-release != 'true' }}
+      upload-to-nuget: ${{ needs.check-release-eligibility.outputs.should-release == 'true' }}
     secrets:
       GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
       NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}

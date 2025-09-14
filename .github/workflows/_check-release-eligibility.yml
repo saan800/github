@@ -19,7 +19,7 @@ on:
     outputs:
       should-release:
         description: If should release or not
-        value: ${{ jobs.check-release-eligibility.should-release }}
+        value: ${{ steps.set-output.outputs.should-release }}
 
 permissions:
   contents: read
