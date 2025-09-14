@@ -31,6 +31,6 @@ jobs:
       is-release-branch: false
       #is-release-branch: ${{ github.ref == 'refs/heads/main' }}
       #force-release: ${{ inputs.force-release }}
-      force-release:: false
+      force-release: false
     secrets:
       GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
