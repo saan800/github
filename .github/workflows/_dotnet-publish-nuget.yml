@@ -130,6 +130,7 @@ jobs:
 
       - name: Find package IDs from .nupkg files
         id: set-matrix
+        working-directory: ${{ inputs.working-directory }}
         run: |
           # Find all .nupkg files in build-packages
           nupkgs=$(find build-packages -type f -name '*.nupkg')
