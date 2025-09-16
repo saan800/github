@@ -138,15 +138,16 @@ jobs:
         id: set-matrix
         run: |
           # extract all <PackageId> from csproj files, or fallback to project name if none
-          packages=$(grep -hoP '(?<=<PackageId>).*?(?=</PackageId>)' **/*.csproj | sort -u)
+          packages=$(grep -hoP '(?<=<PackageId>).*?(?=</PackageId>)' ./**/*.csproj | sort -u || true)
 
           if [ -z "$packages" ]; then
             echo "No <PackageId> found, falling back to project names"
-            packages=$(basename -s .csproj $(ls **/*.csproj))
+            # Use glob expansion directly, and quote each result
+            packages=$(for f in ./**/*.csproj; do basename "$f" .csproj; done)
           fi
 
           # convert to JSON array
-          json=$(jq -nc --argjson arr "$(printf '%s\n' $packages | jq -R . | jq -s .)" '{"package": $arr}')
+          json=$(printf '%s\n' $packages | jq -R . | jq -s '{package: .}')
           echo "matrix=$json" >> $GITHUB_OUTPUT
 
   cleanup:
