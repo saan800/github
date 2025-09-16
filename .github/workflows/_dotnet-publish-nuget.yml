@@ -137,15 +137,15 @@ jobs:
 
           if [ -z "$nupkgs" ]; then
             echo "No .nupkg files found in build-packages/"
-            echo "matrix=[]" >> $GITHUB_OUTPUT
-            exit 1
+            echo "matrix={\"package\":[]}" >> $GITHUB_OUTPUT
+            exit 0
           fi
 
           # Extract package IDs (everything before the last dot + version)
           packages=$(basename -s .nupkg $nupkgs | sed -E 's/\.[0-9]+(\.[0-9]+)*(-[A-Za-z0-9]+)?$//' | sort -u)
 
-          # Convert to JSON array for matrix
-          json=$(printf '%s\n' $packages | jq -R . | jq -s '{package: .}')
+          # Convert to compact JSON array for matrix
+          json=$(printf '%s\n' $packages | jq -R . | jq -cs '{package: .}')
 
           echo "matrix=$json" >> $GITHUB_OUTPUT
 
