@@ -141,13 +141,18 @@ jobs:
             exit 0
           fi
 
-          # Extract package IDs (everything before the last dot + version)
-          packages=$(basename -s .nupkg $nupkgs | sed -E 's/\.[0-9]+(\.[0-9]+)*(-[A-Za-z0-9]+)?$//' | sort -u)
+          # Extract package IDs by removing version/prerelease suffixes
+          packages=$(for f in $nupkgs; do
+            name=$(basename "$f" .nupkg)
+            # Strip ".<digits>..." version suffix, optionally with -prerelease
+            echo "$name" | sed -E 's/\.[0-9]+(\.[0-9]+)*(-[A-Za-z0-9.]+)?$//'
+          done | sort -u)
 
           # Convert to compact JSON array for matrix
           json=$(printf '%s\n' $packages | jq -R . | jq -cs '{package: .}')
 
           echo "matrix=$json" >> $GITHUB_OUTPUT
+          echo "$json"
 
   cleanup:
     needs: discover-packages
