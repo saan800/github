@@ -136,19 +136,34 @@ jobs:
 
       - name: Find package IDs
         id: set-matrix
+        working-directory: ${{ inputs.working-directory }}
         run: |
-          # extract all <PackageId> from csproj files, or fallback to project name if none
-          packages=$(grep -hoP '(?<=<PackageId>).*?(?=</PackageId>)' ./**/*.csproj | sort -u || true)
+          # Collect .csproj files (safe with spaces)
+          mapfile -d '' -t csproj_files < <(find . -type f -name '*.csproj' -print0)
 
-          if [ -z "$packages" ]; then
-            echo "No <PackageId> found, falling back to project names"
-            # Use glob expansion directly, and quote each result
-            packages=$(for f in ./**/*.csproj; do basename "$f" .csproj; done)
+          packages=""
+
+          if [ "${#csproj_files[@]}" -gt 0 ]; then
+            # Extract <PackageId> values (if any) from all csproj files
+            packages=$(grep -hoP '(?<=<PackageId>).*?(?=</PackageId>)' "${csproj_files[@]}" | sort -u || true)
           fi
 
-          # convert to JSON array
-          json=$(printf '%s\n' $packages | jq -R . | jq -s '{package: .}')
-          echo "matrix=$json" >> $GITHUB_OUTPUT
+          if [ -z "$packages" ]; then
+            # Fallback to project file basenames if no <PackageId> values found
+            if [ "${#csproj_files[@]}" -gt 0 ]; then
+              packages=$(for f in "${csproj_files[@]}"; do basename "$f" .csproj; done)
+            fi
+          fi
+
+          if [ -z "$packages" ]; then
+            echo "No packages found in repository."
+            # output an empty array for the matrix
+            echo "matrix={\"package\":[]}" >> $GITHUB_OUTPUT
+          else
+            # Convert newline-separated package names into JSON: { "package": [ "A", "B" ] }
+            json=$(printf '%s\n' "$packages" | jq -R . | jq -s '{package: .}')
+            echo "matrix=$json" >> $GITHUB_OUTPUT
+          fi
 
   cleanup:
     needs: discover-packages
