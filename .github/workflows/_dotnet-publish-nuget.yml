@@ -119,51 +119,34 @@ jobs:
           disable-sudo: true
           egress-policy: block
           allowed-endpoints: >
-            aka.ms:443
-            api.codecov.io:443
-            api.nuget.org:443
-            builds.dotnet.microsoft.com:443
-            ci.dot.net:443
-            cli.codecov.io:443
-            crl3.digicert.com:80
-            dc.services.visualstudio.com:443
-            dotnetcli.azureedge.net:443
-            github.com:443
-            storage.googleapis.com:443
+            nuget.pkg.github.com:443
 
-      - name: Checkout
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      # Download the artifact generated in the build job
+      - name: Download artifact
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # 5.0.0
+        with:
+          name: ${{ inputs.package-artifact-name }}
+          path: ${{ inputs.working-directory }}/build-packages # Path to download the artifact
 
-      - name: Find package IDs
+      - name: Find package IDs from .nupkg files
         id: set-matrix
-        working-directory: ${{ inputs.working-directory }}
         run: |
-          # Collect .csproj files (safe with spaces)
-          mapfile -d '' -t csproj_files < <(find . -type f -name '*.csproj' -print0)
+          # Find all .nupkg files in build-packages
+          nupkgs=$(find build-packages -type f -name '*.nupkg')
 
-          packages=""
-
-          if [ "${#csproj_files[@]}" -gt 0 ]; then
-            # Extract <PackageId> values (if any) from all csproj files
-            packages=$(grep -hoP '(?<=<PackageId>).*?(?=</PackageId>)' "${csproj_files[@]}" | sort -u || true)
+          if [ -z "$nupkgs" ]; then
+            echo "No .nupkg files found in build-packages/"
+            echo "matrix=[]" >> $GITHUB_OUTPUT
+            exit 1
           fi
 
-          if [ -z "$packages" ]; then
-            # Fallback to project file basenames if no <PackageId> values found
-            if [ "${#csproj_files[@]}" -gt 0 ]; then
-              packages=$(for f in "${csproj_files[@]}"; do basename "$f" .csproj; done)
-            fi
-          fi
+          # Extract package IDs (everything before the last dot + version)
+          packages=$(basename -s .nupkg $nupkgs | sed -E 's/\.[0-9]+(\.[0-9]+)*(-[A-Za-z0-9]+)?$//' | sort -u)
 
-          if [ -z "$packages" ]; then
-            echo "No packages found in repository."
-            # output an empty array for the matrix
-            echo "matrix={\"package\":[]}" >> $GITHUB_OUTPUT
-          else
-            # Convert newline-separated package names into JSON: { "package": [ "A", "B" ] }
-            json=$(printf '%s\n' "$packages" | jq -R . | jq -s '{package: .}')
-            echo "matrix=$json" >> $GITHUB_OUTPUT
-          fi
+          # Convert to JSON array for matrix
+          json=$(printf '%s\n' $packages | jq -R . | jq -s '{package: .}')
+
+          echo "matrix=$json" >> $GITHUB_OUTPUT
 
   cleanup:
     needs: discover-packages
