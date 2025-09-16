@@ -21,6 +21,11 @@ on:
         required: false
         type: string
         default: "packages"
+      num-github-prerelease-packages-to-keep:
+        description: "We cleanup github prerelease nuget packages. Configure how many to keep"
+        type: number
+        required: false
+        default: 50
       upload-to-github:
         description: "Upload pacakge to github package registry"
         type: boolean
@@ -41,6 +46,7 @@ on:
 
 permissions:
   contents: read
+  packages: write
 
 jobs:
   publish-nuget-package:
@@ -101,3 +107,63 @@ jobs:
           dotnet nuget push build-packages/*.nupkg
           --source https://api.nuget.org/v3/index.json
           --api-key ${{ secrets.NUGET_API_KEY }}
+
+  discover-packages:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
+        with:
+          disable-sudo: true
+          egress-policy: block
+          allowed-endpoints: >
+            nuget.pkg.github.com:443
+
+      # Download the artifact generated in the build job
+      - name: Download artifact
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # 5.0.0
+        with:
+          name: ${{ inputs.package-artifact-name }}
+          path: ${{ inputs.working-directory }}/build-packages # Path to download the artifact
+
+      - name: Find package IDs from .nupkg files
+        id: set-matrix
+        working-directory: ${{ inputs.working-directory }}
+        run: |
+          # Find all .nupkg files in build-packages
+          nupkgs=$(find build-packages -type f -name '*.nupkg')
+
+          if [ -z "$nupkgs" ]; then
+            echo "No .nupkg files found in build-packages/"
+            echo "matrix={\"package\":[]}" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # Extract package IDs by removing version/prerelease suffixes
+          packages=$(for f in $nupkgs; do
+            name=$(basename "$f" .nupkg)
+            # Strip ".<digits>..." version suffix, optionally with -prerelease
+            echo "$name" | sed -E 's/\.[0-9]+(\.[0-9]+)*(-[A-Za-z0-9.]+)?$//'
+          done | sort -u)
+
+          # Convert to compact JSON array for matrix
+          json=$(printf '%s\n' $packages | jq -R . | jq -cs '{package: .}')
+
+          echo "matrix=$json" >> $GITHUB_OUTPUT
+          echo "$json"
+
+  cleanup:
+    needs: discover-packages
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{ fromJson(needs.discover-packages.outputs.matrix) }}
+    steps:
+      - name: Delete old versions for ${{ matrix.package }}
+        uses: actions/delete-package-versions@v5
+        with:
+          package-name: ${{ matrix.package }}
+          package-type: nuget
+          min-versions-to-keep: ${{ inputs.num-github-prerelease-packages-to-keep }}
+          delete-only-pre-release-versions: true
