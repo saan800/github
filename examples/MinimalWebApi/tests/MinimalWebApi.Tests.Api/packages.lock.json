@@ -4,9 +4,9 @@
     "net9.0": {
       "AwesomeAssertions": {
         "type": "Direct",
-        "requested": "[9.2.0, )",
-        "resolved": "9.2.0",
-        "contentHash": "RCkuFyKmesmZR74XLOzYvTpG/IbHfBeFapFTMvFskPzEK4z3YrVmHB2FIFJ0DhwjuIDdPL/hc8zS40IwMAN0BA=="
+        "requested": "[9.2.1, )",
+        "resolved": "9.2.1",
+        "contentHash": "lbwhyQNXxxEGx4oCbFqNfFy2DsywsvNhN6qoOjY4wwhMgI2L9+YrxjyF/M0io99yrvWV1Cjj12LP2QGcC43Uhw=="
       },
       "coverlet.collector": {
         "type": "Direct",
@@ -144,15 +144,15 @@
       "minimalwebapi.api": {
         "type": "Project",
         "dependencies": {
-          "Microsoft.AspNetCore.OpenApi": "[9.0.9, )",
+          "Microsoft.AspNetCore.OpenApi": "[9.0.10, )",
           "Scalar.AspNetCore": "[2.7.2, )"
         }
       },
       "Microsoft.AspNetCore.OpenApi": {
         "type": "CentralTransitive",
-        "requested": "[9.0.9, )",
-        "resolved": "9.0.9",
-        "contentHash": "3Sina0gS/CTYt9XG6DUFPdXOmJui7e551U0kO2bIiDk3vZ2sctxxenN+cE1a5CrUpjIVZfZr32neWYYRO+Piaw==",
+        "requested": "[9.0.10, )",
+        "resolved": "9.0.10",
+        "contentHash": "yAv5EDEi0Nkk75Vhxh6ppuXd/QIO8hzjGpAt/fGInMZWIX/mVwZ1IM50YFIWeLCVM8KDj0oFPQdcLeQ+9hEJsw==",
         "dependencies": {
           "Microsoft.OpenApi": "1.6.17"
         }
