@@ -144,15 +144,15 @@
       "minimalwebapi.api": {
         "type": "Project",
         "dependencies": {
-          "Microsoft.AspNetCore.OpenApi": "[9.0.11, )",
+          "Microsoft.AspNetCore.OpenApi": "[9.0.12, )",
           "Scalar.AspNetCore": "[2.7.2, )"
         }
       },
       "Microsoft.AspNetCore.OpenApi": {
         "type": "CentralTransitive",
-        "requested": "[9.0.11, )",
-        "resolved": "9.0.11",
-        "contentHash": "rTa3lp6B8KM8AESIwLakTT6XaoUBTnjAZq2pRX6zS/BzQy6mOVUgaawRSyM0WHykHdwbfrEAmer3ys2xE4DVtg==",
+        "requested": "[9.0.12, )",
+        "resolved": "9.0.12",
+        "contentHash": "1MESYhofLCDXPPxxj4fY+e1vqm4ZIMwrt6gbulGNY0fXiNPzhycdIrZJn0JXJmbppEWnkvJtoCPfrzyV1DIpew==",
         "dependencies": {
           "Microsoft.OpenApi": "1.6.17"
         }
