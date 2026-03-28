@@ -1,8 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <IsTestProject>true</IsTestProject>
+      <IsTestProject>true</IsTestProject>
     </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="GitHubActionsTestLogger" />
+    </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\..\src\NugetPackages.Alpha\NugetPackages.Alpha.csproj" />
