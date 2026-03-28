@@ -1,4 +1,4 @@
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -31,16 +31,16 @@ builder.Services.AddOpenApi(o =>
     {
         foreach (var path in document.Paths.Values)
         {
-            foreach (var op in path.Operations.Values)
+            foreach (var op in path.Operations?.Values.ToList() ?? [])
             {
-                if (op.Responses.TryGetValue("201", out var response))
+                if ((op.Responses?.TryGetValue("201", out var response) ?? false) && response.Headers != null)
                 {
-                    response.Headers["Location"] = new Microsoft.OpenApi.Models.OpenApiHeader
+                    response.Headers["Location"] = new OpenApiHeader
                     {
                         Description = "URL of the newly created resource",
-                        Schema = new Microsoft.OpenApi.Models.OpenApiSchema
+                        Schema = new OpenApiSchema
                         {
-                            Type = "string",
+                            Type = JsonSchemaType.String,
                             Format = "uri"
                         }
                     };
