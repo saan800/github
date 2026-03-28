@@ -142,20 +142,12 @@ jobs:
               --configuration Release \
               --framework ${{ matrix.framework }} \
               --report-github \
-              --report-github-summary-include-passed true \
-              --report-github-summary-include-skipped true \
-              --report-github-annotations-title "@test" \
-              --report-github-annotations-message "@error\n@trace" \
               /p:CollectCoverage=true
           else
             dotnet test \
               --no-build \
               --configuration Release \
               --report-github \
-              --report-github-summary-include-passed true \
-              --report-github-summary-include-skipped true \
-              --report-github-annotations-title "@test" \
-              --report-github-annotations-message "@error\n@trace" \
               /p:CollectCoverage=true
           fi
 
