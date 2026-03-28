@@ -136,20 +136,50 @@ jobs:
       - name: Run unit tests
         working-directory: ${{ inputs.working-directory }}
         run: |
+          DOTNET_VERSION="${{ matrix.dotnet-version }}"
+
           if [ -n "${{ matrix.framework }}" ]; then
-            dotnet test \
-              --no-build \
-              --configuration Release \
-              --framework ${{ matrix.framework }} \
-              --report-github \
-              /p:CollectCoverage=true
+            FRAMEWORK_ARG="--framework ${{ matrix.framework }}"
           else
-            dotnet test \
-              --no-build \
-              --configuration Release \
-              --report-github \
-              /p:CollectCoverage=true
+            FRAMEWORK_ARG=""
           fi
+
+          case "$DOTNET_VERSION" in
+            10.*)
+              dotnet test \
+                --no-build \
+                --configuration Release \
+                $FRAMEWORK_ARG \
+                --report-github \
+                /p:CollectCoverage=true
+              ;;
+            *)
+              dotnet test \
+                --no-build \
+                --configuration Release \
+                $FRAMEWORK_ARG \
+                --logger "GitHubActions;summary.includePassedTests=true;summary.includeSkippedTests=true;annotations.titleFormat=@test;annotations.messageFormat=@error\n@trace" \
+                /p:CollectCoverage=true
+              ;;
+          esac
+
+      # - name: Run unit tests
+      #   working-directory: ${{ inputs.working-directory }}
+      #   run: |
+      #     if [ -n "${{ matrix.framework }}" ]; then
+      #       dotnet test \
+      #         --no-build \
+      #         --configuration Release \
+      #         --framework ${{ matrix.framework }} \
+      #         --report-github \
+      #         /p:CollectCoverage=true
+      #     else
+      #       dotnet test \
+      #         --no-build \
+      #         --configuration Release \
+      #         --report-github \
+      #         /p:CollectCoverage=true
+      #     fi
 
       # - name: Run unit tests
       #   working-directory: ${{ inputs.working-directory }}
