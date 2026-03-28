@@ -78,7 +78,7 @@ public class ItemControllerTests(TestHttpClientFactory factory)
         var items = await _client.GetFromJsonAsync<List<Item>>("/api/items", _ct);
         items.Should().NotBeNull("Need existing items to be able to test the delete functionality");
 
-        var itemIdToDelete = items.First().Id;
+        var itemIdToDelete = items.Last().Id;
         var response = await _client.DeleteAsync($"/api/items/{itemIdToDelete}", _ct);
         response.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
