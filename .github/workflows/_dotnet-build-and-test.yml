@@ -135,20 +135,46 @@ jobs:
 
       - name: Run unit tests
         working-directory: ${{ inputs.working-directory }}
-        # run: >
-        #   dotnet test
-        #   --no-restore
-        #   --configuration Release
-        #   --logger "GitHubActions;summary.includePassedTests=true;summary.includeSkippedTests=true;annotations.titleFormat=@test;annotations.messageFormat=@error\n@trace"
-        #   /p:CollectCoverage=true
-        #   --
-        #   RunConfiguration.CollectSourceInformation=true
         run: |
           if [ -n "${{ matrix.framework }}" ]; then
-            dotnet test --no-build --configuration Release --framework ${{ matrix.framework }} --logger "GitHubActions;summary.includePassedTests=true;summary.includeSkippedTests=true;annotations.titleFormat=@test;annotations.messageFormat=@error\n@trace" /p:CollectCoverage=true
+            dotnet test \
+              --no-build \
+              --configuration Release \
+              --framework ${{ matrix.framework }} \
+              --report-github \
+              --report-github-summary-include-passed true \
+              --report-github-summary-include-skipped true \
+              --report-github-annotations-title "@test" \
+              --report-github-annotations-message "@error\n@trace" \
+              /p:CollectCoverage=true
           else
-            dotnet test --no-build --configuration Release --logger "GitHubActions;summary.includePassedTests=true;summary.includeSkippedTests=true;annotations.titleFormat=@test;annotations.messageFormat=@error\n@trace" /p:CollectCoverage=true
+            dotnet test \
+              --no-build \
+              --configuration Release \
+              --report-github \
+              --report-github-summary-include-passed true \
+              --report-github-summary-include-skipped true \
+              --report-github-annotations-title "@test" \
+              --report-github-annotations-message "@error\n@trace" \
+              /p:CollectCoverage=true
           fi
+
+      # - name: Run unit tests
+      #   working-directory: ${{ inputs.working-directory }}
+      #   # run: >
+      #   #   dotnet test
+      #   #   --no-restore
+      #   #   --configuration Release
+      #   #   --logger "GitHubActions;summary.includePassedTests=true;summary.includeSkippedTests=true;annotations.titleFormat=@test;annotations.messageFormat=@error\n@trace"
+      #   #   /p:CollectCoverage=true
+      #   #   --
+      #   #   RunConfiguration.CollectSourceInformation=true
+      #   run: |
+      #     if [ -n "${{ matrix.framework }}" ]; then
+      #       dotnet test --no-build --configuration Release --framework ${{ matrix.framework }} --logger "GitHubActions;summary.includePassedTests=true;summary.includeSkippedTests=true;annotations.titleFormat=@test;annotations.messageFormat=@error\n@trace" /p:CollectCoverage=true
+      #     else
+      #       dotnet test --no-build --configuration Release --logger "GitHubActions;summary.includePassedTests=true;summary.includeSkippedTests=true;annotations.titleFormat=@test;annotations.messageFormat=@error\n@trace" /p:CollectCoverage=true
+      #     fi
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6.0.0
