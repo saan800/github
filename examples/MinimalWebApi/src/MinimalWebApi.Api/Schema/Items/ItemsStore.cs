@@ -7,7 +7,7 @@ public class ItemsStore
 
     public List<Item> GetAll()
     {
-        lock (_lock) return [.._items];
+        lock (_lock) return [.. _items];
     }
 
     public Item? GetById(int id)
@@ -25,7 +25,7 @@ public class ItemsStore
                 Name = request.Name,
                 Description = request.Description,
             };
-            _items = [.._items.Where(x => x.Id != newItem.Id), newItem];
+            _items = [.. _items.Where(x => x.Id != newItem.Id), newItem];
             return newItem;
         }
     }
@@ -40,7 +40,7 @@ public class ItemsStore
             if (request.Name != null) item.Name = request.Name;
             if (request.Description != null) item.Description = request.Description;
 
-            _items = [.._items.Where(x => x.Id != id), item];
+            _items = [.. _items.Where(x => x.Id != id), item];
             return true;
         }
     }
