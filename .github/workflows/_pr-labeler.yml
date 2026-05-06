@@ -111,12 +111,12 @@ jobs:
 
             const labelColors = {
               breaking: "b60205",
-              feature: "0e8a16",
+              feature: "a2eeef",
               bug: "d73a4a",
-              documentation: "0075ca",
-              misc: "cfd3d7",
-              configuration: "5319e7",
-              "no-release": "aaaaaa"
+              documentation: "008672",
+              misc: "7057ff",
+              configuration: "fc27c6",
+              "no-release": "999999"
             };
 
             const breakingLabel = "breaking";

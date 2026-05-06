@@ -16,8 +16,9 @@
   </PropertyGroup>
 
   <PropertyGroup>
+    <IsTestProject Condition="$(MSBuildProjectName.Contains('.Tests.'))">true</IsTestProject>
+    <IsTestProject Condition="$(MSBuildProjectName.EndsWIth('.Tests'))">true</IsTestProject>
     <IsTestProject Condition="'$(IsTestProject)' == ''">false</IsTestProject>
-    <IsTestProject Condition="$(MSBuildProjectName.StartsWith('MinimalWebApi.Tests.'))">true</IsTestProject>
     <IsPackable Condition="'$(IsTestProject)' == 'true'">false</IsPackable>
     <IsPackable Condition="'$(IsPackable)' == ''">false</IsPackable>
   </PropertyGroup>
@@ -28,7 +29,7 @@
     <CoverletOutput>$([System.IO.Path]::Combine($(MSBuildProjectDirectory), "../../", 'reports', 'coverage'))/</CoverletOutput>
     <CoverletOutputFormat>opencover,json</CoverletOutputFormat>
     <MergeWith>$(CoverletOutput)/coverage.json</MergeWith>
-    <Exclude>[MinimalWebApi.Tests.*]*,[xunit.*]*</Exclude>
+    <Exclude>[*.Tests.*]*,[xunit.*]*</Exclude>
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(IsTestProject)' == 'true'">
