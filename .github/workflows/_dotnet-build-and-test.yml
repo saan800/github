@@ -13,14 +13,14 @@ on:
         type: string
         default: ubuntu-latest
       dotnet-version-matrix:
-        description: 'JSON array of dotnet-version/framework pairs. Must be on one line. eg ''[{ "dotnet-version": "8.0.x", "framework": "net8.0" }, { "dotnet-version": "9.0.x", "framework": "net9.0" }]'''
+        description: 'JSON array of dotnet-version/framework pairs. Must be on one line. eg ''[{ "dotnet-version": "9.0.x", "framework": "net9.0" }, { "dotnet-version": "10.0.x", "framework": "net10.0" }]'''
         required: false
         type: string
       dotnet-version:
         description: "Dotnet SDK version to use if no matrix is provided"
         required: false
         type: string
-        default: 9.0.x
+        default: 10.0.x
       codecov-slug:
         description: "Slug to upload code coverage results for Codecov. e.g. saan800/saansoft-correlationId"
         required: false
