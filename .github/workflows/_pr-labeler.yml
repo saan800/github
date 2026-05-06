@@ -89,8 +89,120 @@ jobs:
           allowed-endpoints: >
             api.github.com:443
 
-      # config in /.github/pr-labeler.yml
       - name: Label PR
-        uses: grafana/pr-labeler-action@50737759cb150f5d312de1a45559027156db8bab # v0.1.0
+        uses: actions/github-script@v7
         with:
-          token: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+          github-token: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+          script: |
+            const pr = context.payload.pull_request;
+            const title = pr.title.toLowerCase();
+
+            // === CONFIG ===
+            const labelMapping = {
+              breaking: ["breaking", "breaking change", "breaking changes"],
+              bug: ["fix", "bug", "hotfix", "bugfix"],
+              documentation: ["docs"],
+              feature: ["feat", "feature"],
+              dependencies: ["dependencies"],
+              misc: ["perf", "refactor", "revert", "style", "test"],
+              configuration: ["build", "ci"],
+              "no-release": ["build", "chore", "ci"]
+            };
+
+            const labelColors = {
+              breaking: "b60205",
+              feature: "0e8a16",
+              bug: "d73a4a",
+              documentation: "0075ca",
+              misc: "cfd3d7",
+              configuration: "5319e7",
+              "no-release": "aaaaaa"
+            };
+
+            const breakingLabel = "breaking";
+
+            // === HELPERS ===
+            function extractType(title) {
+              const match = title.match(/^(\w+)(!:)?:/);
+              if (!match) return null;
+
+              return {
+                type: match[1],
+                breaking: !!match[2]
+              };
+            }
+
+            function resolveLabels(typeInfo) {
+              const labels = new Set();
+              if (!typeInfo) return labels;
+
+              const { type, breaking } = typeInfo;
+
+              for (const [label, keywords] of Object.entries(labelMapping)) {
+                if (keywords.includes(type)) {
+                  labels.add(label);
+                }
+              }
+
+              if (breaking) {
+                labels.add(breakingLabel);
+              }
+
+              return labels;
+            }
+
+            async function ensureLabelExists(name) {
+              try {
+                await github.rest.issues.getLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name
+                });
+              } catch (e) {
+                if (e.status === 404) {
+                  const color = labelColors[name] || "ededed";
+
+                  core.info(`Creating missing label: ${name} (${color})`);
+
+                  await github.rest.issues.createLabel({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    name,
+                    color
+                  });
+                } else {
+                  throw e;
+                }
+              }
+            }
+
+            // === EXECUTION ===
+            const typeInfo = extractType(title);
+            const labels = resolveLabels(typeInfo);
+
+            if (labels.size === 0) {
+              core.info("No labels resolved from PR title.");
+              return;
+            }
+
+            const labelList = Array.from(labels);
+            core.info(`Resolved labels: ${labelList.join(", ")}`);
+
+            // ensure labels exist with correct colours
+            for (const label of labelList) {
+              await ensureLabelExists(label);
+            }
+
+            const existingLabels = pr.labels.map(l => l.name);
+            const labelsToAdd = labelList.filter(l => !existingLabels.includes(l));
+
+            if (labelsToAdd.length > 0) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                labels: labelsToAdd
+              });
+            } else {
+              core.info("No new labels to add.");
+            }
