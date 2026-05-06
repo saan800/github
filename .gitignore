@@ -25,6 +25,11 @@
 # For more Rider gitignore rules: https://github.com/JetBrains/resharper-rider-samples/blob/master/.gitignore
 #.idea/
 
+# ********************************************** #
+# ******************** OTHER ******************* #
+# ********************************************** #
+
+.claude/settings.local.json
 
 # ********************************************** #
 # ******************** CODE ******************** #
@@ -49,6 +54,7 @@ obj
 
 /coverage
 /reports
+/TestResults
 npm-debug.log
 yarn-error.log
 testem.log

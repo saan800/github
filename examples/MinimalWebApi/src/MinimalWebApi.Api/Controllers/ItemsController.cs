@@ -7,19 +7,14 @@ namespace MinimalWebApi.Api.Controllers;
 // https://learn.microsoft.com/en-us/aspnet/core/fundamentals/openapi/openapi-comments?view=aspnetcore-10.0
 
 [Route("api/[controller]")]
-public class ItemsController : BaseController
+public class ItemsController(ItemsStore store) : BaseController
 {
-    private static List<Item> _items = Enumerable
-        .Range(1, 5)
-        .Select(x => new Item { Id = x, Name = $"Item {x}" })
-        .ToList();
-
     [HttpGet]
     [ProducesResponseType(typeof(List<Item>), StatusCodes.Status200OK)]
     [EndpointDescription("Get all items, ordered by Id")]
     public IActionResult GetAll()
     {
-        return Ok(_items.OrderBy(x => x.Id));
+        return Ok(store.GetAll().OrderBy(x => x.Id));
     }
 
     [HttpGet("{id:int}")]
@@ -28,7 +23,7 @@ public class ItemsController : BaseController
     [EndpointDescription("Get an item's details for the provided id")]
     public IActionResult GetById(int id)
     {
-        var item = _items.FirstOrDefault(x => x.Id == id);
+        var item = store.GetById(id);
         return item == null
             ? NotFound()
             : Ok(item);
@@ -39,18 +34,7 @@ public class ItemsController : BaseController
     [EndpointDescription("Create a new item. On success returns 201 Created and sets the Location header to the new item's URL.")]
     public IActionResult Create([FromBody] CreateItemRequest request)
     {
-        var newItem = new Item
-        {
-            Id = _items.Count == 0 ? 1 : _items.Max(x => x.Id) + 1,
-            Name = request.Name,
-            Description = request.Description,
-        };
-
-        _items = _items
-            .Where(x => x.Id != newItem.Id)
-            .Append(newItem)
-            .ToList();
-
+        var newItem = store.Add(request);
         return Created($"/api/items/{newItem.Id}", null);
     }
 
@@ -60,18 +44,9 @@ public class ItemsController : BaseController
     [EndpointDescription("Updates only the provided fields for an item")]
     public IActionResult PatchUpdate(int id, [FromBody] PatchItemRequest patchRequest)
     {
-        var item = _items.FirstOrDefault(x => x.Id == id);
-        if (item == null) return NotFound();
-
-        if (patchRequest.Name != null) item.Name = patchRequest.Name;
-        if (patchRequest.Description != null) item.Description = patchRequest.Description;
-
-        _items = _items
-            .Where(x => x.Id != item.Id)
-            .Append(item)
-            .ToList();
-
-        return Accepted($"/api/items/{item.Id}");
+        var updated = store.Patch(id, patchRequest);
+        if (!updated) return NotFound();
+        return Accepted($"/api/items/{id}");
     }
 
     [HttpDelete("{id:int}")]
@@ -79,10 +54,7 @@ public class ItemsController : BaseController
     [EndpointDescription("Deletes the item with the provided id")]
     public IActionResult Delete(int id)
     {
-        _items = _items
-            .Where(x => x.Id != id)
-            .ToList();
-
+        store.Delete(id);
         return NoContent();
     }
 }

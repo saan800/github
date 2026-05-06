@@ -1,5 +1,4 @@
 using MinimalWebApi.Api.Schema.Items;
-using Xunit;
 
 namespace MinimalWebApi.Tests.Api.Schema;
 

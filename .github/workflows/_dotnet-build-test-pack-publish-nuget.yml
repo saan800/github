@@ -3,6 +3,11 @@ name: dotnet-build-test-pack-publish-nuget
 on:
   workflow_call:
     inputs:
+      harden-runner-policy:
+        description: "The egress policy for the Harden Runner step. Defaults to 'block'"
+        required: false
+        type: string
+        default: "block"
       working-directory:
         description: "The working directory for the job. Defaults to '.' which is the root of the repository. Do not include trailing '/'"
         required: false
@@ -14,14 +19,14 @@ on:
         type: string
         default: ubuntu-latest
       dotnet-version-matrix:
-        description: 'JSON array of dotnet-version/framework pairs, used for testing. Must be on one line. eg ''[{ "dotnet-version": "8.0.x", "framework": "net8.0" }, { "dotnet-version": "9.0.x", "framework": "net9.0" }]'''
+        description: 'JSON array of dotnet-version/framework pairs. Must be on one line. eg ''[{ "dotnet-version": "9.0.x", "framework": "net9.0" }, { "dotnet-version": "10.0.x", "framework": "net10.0" }]'''
         required: false
         type: string
       dotnet-version:
-        description: The dotnet version to run the non-matrix jobs with. e.g. "9.0.x".
+        description: The dotnet version to run the non-matrix jobs with. e.g. "10.0.x".
         required: false
         type: string
-        default: 9.0.x
+        default: 10.0.x
       num-github-prerelease-packages-to-keep:
         description: "We cleanup github prerelease nuget packages. Configure how many to keep"
         type: number
@@ -41,7 +46,7 @@ on:
         type: boolean
         required: true
       force-release:
-        description: "Force a release regardless of PR labels"
+        description: "Force a release regardless of PR labels or branch"
         type: boolean
         required: false
         default: false
@@ -64,6 +69,7 @@ jobs:
   get-version:
     uses: ./.github/workflows/_version.yml
     with:
+      harden-runner-policy: ${{ inputs.harden-runner-policy }}
       is-release-branch: ${{ inputs.is-release-branch }}
 
   check-release-eligibility:
@@ -80,6 +86,7 @@ jobs:
   build-and-test:
     uses: ./.github/workflows/_dotnet-build-and-test.yml
     with:
+      harden-runner-policy: ${{ inputs.harden-runner-policy }}
       working-directory: ${{ inputs.working-directory }}
       os: ${{ inputs.os }}
       dotnet-version-matrix: ${{ inputs.dotnet-version-matrix }}
@@ -94,6 +101,7 @@ jobs:
       - get-version
     uses: ./.github/workflows/_dotnet-build-and-pack.yml
     with:
+      harden-runner-policy: ${{ inputs.harden-runner-policy }}
       working-directory: ${{ inputs.working-directory }}
       os: ${{ inputs.os }}
       dotnet-version: ${{ inputs.dotnet-version }}
@@ -110,13 +118,14 @@ jobs:
       packages: write
     uses: ./.github/workflows/_dotnet-publish-nuget.yml
     with:
+      harden-runner-policy: ${{ inputs.harden-runner-policy }}
       working-directory: ${{ inputs.working-directory }}
       os: ${{ inputs.os }}
       dotnet-version: ${{ inputs.dotnet-version }}
       package-artifact-name: "packages"
       num-github-prerelease-packages-to-keep: ${{ inputs.num-github-prerelease-packages-to-keep }}
-      upload-to-github: ${{ inputs.is-release-branch == false && needs.check-release-eligibility.outputs.should-release == 'false' }}
-      upload-to-nuget: ${{ needs.check-release-eligibility.outputs.should-release == 'true' }}
+      upload-to-github: ${{ inputs.is-release-branch == false || needs.check-release-eligibility.outputs.should-release == 'false' }}
+      upload-to-nuget: ${{ inputs.is-release-branch == true && needs.check-release-eligibility.outputs.should-release == 'true' }}
     secrets:
       GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
       NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
@@ -131,7 +140,7 @@ jobs:
       contents: write
     uses: ./.github/workflows/_github-tag-and-release.yml
     with:
-      os: ${{ inputs.os }}
+      harden-runner-policy: ${{ inputs.harden-runner-policy }}
       version: ${{ needs.get-version.outputs.version }}
     secrets:
       GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}

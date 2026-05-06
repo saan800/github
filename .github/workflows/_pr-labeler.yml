@@ -2,6 +2,12 @@ name: pr-labeler
 
 on:
   workflow_call:
+    inputs:
+      harden-runner-policy:
+        description: "The egress policy for the Harden Runner step. Defaults to 'block'"
+        required: false
+        type: string
+        default: "block"
     secrets:
       GITHUB_ACCESS_TOKEN:
         description: "(ie: GITHUB_TOKEN) GitHub token"
@@ -23,7 +29,7 @@ jobs:
         uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
         with:
           disable-sudo: true
-          egress-policy: block
+          egress-policy: ${{ inputs.harden-runner-policy }}
           allowed-endpoints: >
             api.github.com:443
 
@@ -85,12 +91,129 @@ jobs:
         uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
         with:
           disable-sudo: true
-          egress-policy: block
+          egress-policy: ${{ inputs.harden-runner-policy }}
           allowed-endpoints: >
             api.github.com:443
 
-      # config in /.github/pr-labeler.yml
-      - name: Label PR
-        uses: grafana/pr-labeler-action@50737759cb150f5d312de1a45559027156db8bab # v0.1.0
+      - name: Ensure Labels Exist
+        uses: actions/github-script@v7
         with:
-          token: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+          github-token: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+          script: |
+            const labelConfig = {
+              breaking:      { color: "b60205", description: "Introduces a breaking change" },
+              bug:           { color: "d73a4a", description: "Something isn't working" },
+              configuration: { color: "fc27c6", description: "Pull request is updating configuration" },
+              dependencies:  { color: "0366d6", description: "Dependency updates" },
+              documentation: { color: "008672", description: "Improvements or additions to documentation" },
+              duplicate:     { color: "cfd3d7", description: "This issue or pull request already exists" },
+              feature:       { color: "a2eeef", description: "New feature or request" },
+              "help wanted": { color: "0E8A16", description: "Extra attention is needed" },
+              invalid:       { color: "e4e669", description: "This doesn't seem right" },
+              misc:          { color: "7057ff", description: "Non-functional changes such as performance, tests and refactoring" },
+              "no-release":  { color: "999999", description: "Changes don't require a release and wont be included in the release notes" },
+              question:      { color: "d876e3", description: "Further information is requested" },
+              wontfix:       { color: "ffffff", description: "This will not be worked on" },
+            };
+
+            for (const [name, { color, description }] of Object.entries(labelConfig)) {
+              try {
+                await github.rest.issues.getLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name
+                });
+              } catch (e) {
+                if (e.status === 404) {
+                  core.info(`Creating missing label: ${name} (${color})`);
+
+                  await github.rest.issues.createLabel({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    name,
+                    color,
+                    description
+                  });
+                } else {
+                  throw e;
+                }
+              }
+            }
+
+      - name: Label PR
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+          script: |
+            const pr = context.payload.pull_request;
+            const title = pr.title.toLowerCase();
+
+            // === CONFIG ===
+            const labelMapping = {
+              breaking: ["breaking", "breaking change", "breaking changes"],
+              bug: ["fix", "bug", "hotfix", "bugfix"],
+              documentation: ["docs"],
+              feature: ["feat", "feature"],
+              dependencies: ["dependencies"],
+              misc: ["perf", "refactor", "revert", "style", "test"],
+              configuration: ["build", "ci"],
+              "no-release": ["build", "chore", "ci"]
+            };
+
+            const breakingLabel = "breaking";
+
+            // === HELPERS ===
+            function extractType(title) {
+              const match = title.match(/^(\w+)(?:\([^)]*\))?(!)?\s*:/);
+              if (!match) return null;
+
+              return {
+                type: match[1],
+                breaking: !!match[2]
+              };
+            }
+
+            function resolveLabels(typeInfo) {
+              const labels = new Set();
+              if (!typeInfo) return labels;
+
+              const { type, breaking } = typeInfo;
+
+              for (const [label, keywords] of Object.entries(labelMapping)) {
+                if (keywords.includes(type)) {
+                  labels.add(label);
+                }
+              }
+
+              if (breaking) {
+                labels.add(breakingLabel);
+              }
+
+              return labels;
+            }
+
+            // === EXECUTION ===
+            const typeInfo = extractType(title);
+            const labels = resolveLabels(typeInfo);
+
+            if (labels.size === 0) {
+              core.info("No labels resolved from PR title.");
+              return;
+            }
+
+            const labelList = Array.from(labels);
+            core.info(`Resolved labels: ${labelList.join(", ")}`);
+
+            const existingLabels = pr.labels.map(l => l.name);
+            const labelsToAdd = labelList.filter(l => !existingLabels.includes(l));
+
+            if (labelsToAdd.length > 0) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                labels: labelsToAdd
+              });
+            } else {
+              core.info("No new labels to add.");
+            }

@@ -1,9 +1,11 @@
 using Microsoft.OpenApi;
+using MinimalWebApi.Api.Schema.Items;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddSingleton<ItemsStore>();
 builder.Services.AddControllers();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -54,18 +56,20 @@ builder.Services.AddOpenApi(o =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-// if (app.Environment.IsDevelopment())
-// {
-// Enable OpenAPI JSON
-app.MapOpenApi(); //.CacheOutput(); // Add Scalar UI pointing to the OpenAPI JSON
-app.MapScalarApiReference("docs", options =>
+var isProduction = app.Environment.EnvironmentName.Contains("prod", StringComparison.OrdinalIgnoreCase);
+
+if (!isProduction)
 {
-    options
-        .WithTheme(ScalarTheme.DeepSpace)
-        .WithDefaultHttpClient(ScalarTarget.Shell, ScalarClient.Curl)
-        .AddDocument("v1");
-});
-// }
+    // Enable OpenAPI JSON and Scalar UI
+    app.MapOpenApi();
+    app.MapScalarApiReference("docs", options =>
+    {
+        options
+            .WithTheme(ScalarTheme.DeepSpace)
+            .WithDefaultHttpClient(ScalarTarget.Shell, ScalarClient.Curl)
+            .AddDocument("v1");
+    });
+}
 
 app.UseHttpsRedirection();
 

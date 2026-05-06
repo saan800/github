@@ -8,5 +8,7 @@ public class InMemoryApiClientProvider : IApiClientProvider, IDisposable
 
     public HttpClient CreateClient() => _factory.CreateClient();
 
+    public IServiceProvider Services => _factory.Services;
+
     public void Dispose() => _factory.Dispose();
 }

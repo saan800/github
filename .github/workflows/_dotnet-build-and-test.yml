@@ -3,6 +3,11 @@ name: dotnet-build-and-test
 on:
   workflow_call:
     inputs:
+      harden-runner-policy:
+        description: "The egress policy for the Harden Runner step. Defaults to 'block'"
+        required: false
+        type: string
+        default: "block"
       working-directory:
         description: "The working directory for the job. Defaults to '.' which is the root of the repository. Do not include trailing '/'"
         required: false
@@ -13,14 +18,14 @@ on:
         type: string
         default: ubuntu-latest
       dotnet-version-matrix:
-        description: 'JSON array of dotnet-version/framework pairs. Must be on one line. eg ''[{ "dotnet-version": "8.0.x", "framework": "net8.0" }, { "dotnet-version": "9.0.x", "framework": "net9.0" }]'''
+        description: 'JSON array of dotnet-version/framework pairs. Must be on one line. eg ''[{ "dotnet-version": "9.0.x", "framework": "net9.0" }, { "dotnet-version": "10.0.x", "framework": "net10.0" }]'''
         required: false
         type: string
       dotnet-version:
         description: "Dotnet SDK version to use if no matrix is provided"
         required: false
         type: string
-        default: 9.0.x
+        default: 10.0.x
       codecov-slug:
         description: "Slug to upload code coverage results for Codecov. e.g. saan800/saansoft-correlationId"
         required: false
@@ -79,7 +84,7 @@ jobs:
         uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
         with:
           disable-sudo: true
-          egress-policy: block
+          egress-policy: ${{ inputs.harden-runner-policy }}
           allowed-endpoints: >
             aka.ms:443
             api.codecov.io:443

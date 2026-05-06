@@ -3,10 +3,11 @@ name: github-tag-and-release
 on:
   workflow_call:
     inputs:
-      os:
+      harden-runner-policy:
+        description: "The egress policy for the Harden Runner step. Defaults to 'block'"
         required: false
         type: string
-        default: ubuntu-latest
+        default: "block"
       version:
         description: "Version number to tag and release (without the 'v' prefix)"
         required: true
@@ -21,7 +22,7 @@ permissions:
 
 jobs:
   tag-and-release:
-    runs-on: ${{ inputs.os }}
+    runs-on: ubuntu-latest
     permissions:
       contents: write
 
@@ -29,7 +30,7 @@ jobs:
       - name: Harden Runner
         uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
         with:
-          egress-policy: audit
+          egress-policy: ${{ inputs.harden-runner-policy }}
 
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
