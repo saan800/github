@@ -89,6 +89,51 @@ jobs:
           allowed-endpoints: >
             api.github.com:443
 
+      - name: Ensure Labels Exist
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+          script: |
+            const labelConfig = {
+              breaking:      { color: "b60205", description: "Introduces a breaking change" },
+              bug:           { color: "d73a4a", description: "Something isn't working" },
+              configuration: { color: "fc27c6", description: "Pull request is updating configuration" },
+              dependencies:  { color: "0366d6", description: "Dependency updates" },
+              documentation: { color: "008672", description: "Improvements or additions to documentation" },
+              duplicate:     { color: "cfd3d7", description: "This issue or pull request already exists" },
+              feature:       { color: "a2eeef", description: "New feature or request" },
+              "help wanted": { color: "0E8A16", description: "Extra attention is needed" },
+              invalid:       { color: "e4e669", description: "This doesn't seem right" },
+              misc:          { color: "7057ff", description: "Non-functional changes such as performance, tests and refactoring" },
+              "no-release":  { color: "999999", description: "Changes don't require a release and wont be included in the release notes" },
+              question:      { color: "d876e3", description: "Further information is requested" },
+              wontfix:       { color: "ffffff", description: "This will not be worked on" },
+            };
+
+            for (const [name, { color, description }] of Object.entries(labelConfig)) {
+              try {
+                await github.rest.issues.getLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name
+                });
+              } catch (e) {
+                if (e.status === 404) {
+                  core.info(`Creating missing label: ${name} (${color})`);
+
+                  await github.rest.issues.createLabel({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    name,
+                    color,
+                    description
+                  });
+                } else {
+                  throw e;
+                }
+              }
+            }
+
       - name: Label PR
         uses: actions/github-script@v7
         with:
@@ -107,16 +152,6 @@ jobs:
               misc: ["perf", "refactor", "revert", "style", "test"],
               configuration: ["build", "ci"],
               "no-release": ["build", "chore", "ci"]
-            };
-
-            const labelColors = {
-              breaking: "b60205",
-              feature: "a2eeef",
-              bug: "d73a4a",
-              documentation: "008672",
-              misc: "7057ff",
-              configuration: "fc27c6",
-              "no-release": "999999"
             };
 
             const breakingLabel = "breaking";
@@ -151,31 +186,6 @@ jobs:
               return labels;
             }
 
-            async function ensureLabelExists(name) {
-              try {
-                await github.rest.issues.getLabel({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  name
-                });
-              } catch (e) {
-                if (e.status === 404) {
-                  const color = labelColors[name] || "ededed";
-
-                  core.info(`Creating missing label: ${name} (${color})`);
-
-                  await github.rest.issues.createLabel({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    name,
-                    color
-                  });
-                } else {
-                  throw e;
-                }
-              }
-            }
-
             // === EXECUTION ===
             const typeInfo = extractType(title);
             const labels = resolveLabels(typeInfo);
@@ -187,11 +197,6 @@ jobs:
 
             const labelList = Array.from(labels);
             core.info(`Resolved labels: ${labelList.join(", ")}`);
-
-            // ensure labels exist with correct colours
-            for (const label of labelList) {
-              await ensureLabelExists(label);
-            }
 
             const existingLabels = pr.labels.map(l => l.name);
             const labelsToAdd = labelList.filter(l => !existingLabels.includes(l));
