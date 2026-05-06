@@ -115,8 +115,8 @@ jobs:
       dotnet-version: ${{ inputs.dotnet-version }}
       package-artifact-name: "packages"
       num-github-prerelease-packages-to-keep: ${{ inputs.num-github-prerelease-packages-to-keep }}
-      upload-to-github: ${{ inputs.is-release-branch == false && needs.check-release-eligibility.outputs.should-release == 'false' }}
-      upload-to-nuget: ${{ needs.check-release-eligibility.outputs.should-release == 'true' }}
+      upload-to-github: ${{ inputs.is-release-branch == false || needs.check-release-eligibility.outputs.should-release == 'false' }}
+      upload-to-nuget: ${{ inputs.is-release-branch == true && needs.check-release-eligibility.outputs.should-release == 'true' }}
     secrets:
       GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
       NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}

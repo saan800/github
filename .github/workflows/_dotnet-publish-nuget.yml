@@ -27,12 +27,12 @@ on:
         required: false
         default: 50
       upload-to-github:
-        description: "Upload pacakge to github package registry"
+        description: "Upload package to github package registry"
         type: boolean
         required: false
         default: false
       upload-to-nuget:
-        description: "Upload pacakge to nuget.org registry"
+        description: "Upload package to nuget.org registry"
         type: boolean
         required: false
         default: false
@@ -83,15 +83,16 @@ jobs:
         with:
           dotnet-version: ${{ inputs.dotnet-version }}
 
-      - name: Publish nuget pacakge(s) to GitHub Package Registry
+      - name: Publish nuget package(s) to GitHub Package Registry
         if: ${{ inputs.upload-to-github }}
         working-directory: ${{ inputs.working-directory }}
         run: >
           dotnet nuget push build-packages/*.nupkg
+          --skip-duplicate
           --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
           --api-key ${{ secrets.GITHUB_ACCESS_TOKEN }}
 
-      - name: Publish symbol pacakge(s) to GitHub Package Registry
+      - name: Publish symbol package(s) to GitHub Package Registry
         if: ${{ inputs.upload-to-github }}
         working-directory: ${{ inputs.working-directory }}
         run: >
@@ -105,6 +106,7 @@ jobs:
         working-directory: ${{ inputs.working-directory }}
         run: >
           dotnet nuget push build-packages/*.nupkg
+          --skip-duplicate
           --source https://api.nuget.org/v3/index.json
           --api-key ${{ secrets.NUGET_API_KEY }}
 

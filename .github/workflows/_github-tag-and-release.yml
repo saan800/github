@@ -3,10 +3,6 @@ name: github-tag-and-release
 on:
   workflow_call:
     inputs:
-      os:
-        required: false
-        type: string
-        default: ubuntu-latest
       version:
         description: "Version number to tag and release (without the 'v' prefix)"
         required: true
@@ -21,7 +17,7 @@ permissions:
 
 jobs:
   tag-and-release:
-    runs-on: ${{ inputs.os }}
+    runs-on: ubuntu-latest
     permissions:
       contents: write
 

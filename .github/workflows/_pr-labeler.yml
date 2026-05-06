@@ -158,7 +158,7 @@ jobs:
 
             // === HELPERS ===
             function extractType(title) {
-              const match = title.match(/^(\w+)(!:)?:/);
+              const match = title.match(/^(\w+)(?:\([^)]*\))?(!)?\s*:/);
               if (!match) return null;
 
               return {

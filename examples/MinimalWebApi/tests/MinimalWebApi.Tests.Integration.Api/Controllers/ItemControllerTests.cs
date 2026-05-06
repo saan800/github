@@ -1,14 +1,23 @@
 using System.Net;
 using System.Net.Http.Json;
+using Microsoft.Extensions.DependencyInjection;
 using MinimalWebApi.Api.Schema.Items;
 
 namespace MinimalWebApi.Tests.Integration.Api.Controllers;
 
 [Collection(TestConfigConstants.Collections.Api)]
-public class ItemControllerTests(TestHttpClientFactory factory)
+public class ItemControllerTests(TestHttpClientFactory factory) : IAsyncLifetime
 {
     private readonly HttpClient _client = factory.CreateClient();
     private readonly CancellationToken _ct = TestContext.Current.CancellationToken;
+
+    public ValueTask InitializeAsync()
+    {
+        factory.Provider.Services?.GetService<ItemsStore>()?.Reset();
+        return ValueTask.CompletedTask;
+    }
+
+    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 
     [Fact]
     public async Task GetAll_ShouldReturnSeededItems()
@@ -54,7 +63,7 @@ public class ItemControllerTests(TestHttpClientFactory factory)
     public async Task Patch_ShouldModifyExistingItem()
     {
         var currentItems = await _client.GetFromJsonAsync<List<Item>>("/api/items", _ct);
-        currentItems.Should().NotBeNull("Need existing items to be able to test the create functionality");
+        currentItems.Should().NotBeNull("Need existing items to be able to test the patch functionality");
 
         var itemToModify = currentItems.Last();
         var patchRequest = new PatchItemRequest { Description = $"Updated description {Guid.NewGuid()}" };

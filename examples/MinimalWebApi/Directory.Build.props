@@ -10,14 +10,14 @@
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-    <PackageOutputPath>$(MSBuildThisFileDirectory)artifacts\packages</PackageOutputPath>
+    <PackageOutputPath>$(MSBuildThisFileDirectory)artifacts/packages</PackageOutputPath>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>CS1591</NoWarn> <!-- optional: hides missing XML comment warnings -->
   </PropertyGroup>
 
   <PropertyGroup>
     <IsTestProject Condition="$(MSBuildProjectName.Contains('.Tests.'))">true</IsTestProject>
-    <IsTestProject Condition="$(MSBuildProjectName.EndsWIth('.Tests'))">true</IsTestProject>
+    <IsTestProject Condition="$(MSBuildProjectName.EndsWith('.Tests'))">true</IsTestProject>
     <IsTestProject Condition="'$(IsTestProject)' == ''">false</IsTestProject>
     <IsPackable Condition="'$(IsTestProject)' == 'true'">false</IsPackable>
     <IsPackable Condition="'$(IsPackable)' == ''">false</IsPackable>
