@@ -22,9 +22,9 @@
       },
       "GitHubActionsTestLogger": {
         "type": "Direct",
-        "requested": "[3.0.0, )",
-        "resolved": "3.0.0",
-        "contentHash": "IF1ec/P3ifLfxbzbTErJizFcU8fgAFD+LAeaH+QJ7DT978WjI+0yydvCgu43fy5+A+IEH3l7EXXgX46X0w3Qzg=="
+        "requested": "[3.0.4, )",
+        "resolved": "3.0.4",
+        "contentHash": "24fDBf5g5KuyeK9OIu4z0zIkOu6DE3JCmRP+NyNGL3PVmd2Yls8sR8dC1/j34t2tZQS/0arQs7GZTmwWYk4qbQ=="
       },
       "Microsoft.NET.Test.Sdk": {
         "type": "Direct",
