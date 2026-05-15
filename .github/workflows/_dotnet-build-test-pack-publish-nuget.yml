@@ -79,6 +79,7 @@ jobs:
       contents: read
       pull-requests: read
     with:
+      harden-runner-policy: ${{ inputs.harden-runner-policy }}
       is-release-branch: ${{ inputs.is-release-branch }}
       force-release: ${{ inputs.force-release }}
     secrets: inherit

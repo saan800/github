@@ -168,7 +168,7 @@ jobs:
       matrix: ${{ fromJson(needs.discover-packages.outputs.matrix) }}
     steps:
       - name: Delete old versions for ${{ matrix.package }}
-        uses: actions/delete-package-versions@v5
+        uses: actions/delete-package-versions@e5bc658cc4c965c472efe991f8beea3981499c55 # v5
         with:
           package-name: ${{ matrix.package }}
           package-type: nuget

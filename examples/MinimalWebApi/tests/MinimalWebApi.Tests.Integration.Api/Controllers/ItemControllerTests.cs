@@ -94,4 +94,11 @@ public class ItemControllerTests(TestHttpClientFactory factory) : IAsyncLifetime
         var notFound = await _client.GetAsync($"/api/items/{itemIdToDelete}", _ct);
         notFound.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
+
+    [Fact]
+    public async Task Delete_ShouldReturn404ForNonExistentItem()
+    {
+        var response = await _client.DeleteAsync("/api/items/99999", _ct);
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
 }
