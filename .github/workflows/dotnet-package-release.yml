@@ -67,77 +67,21 @@ permissions:
   pull-requests: read
 
 jobs:
-  get-version:
-    uses: ./.github/workflows/_version.yml
-    with:
-      harden-runner-policy: ${{ inputs.harden-runner-policy }}
-      is-release-branch: ${{ inputs.is-release-branch }}
-
-  check-release-eligibility:
-    uses: ./.github/workflows/_check-release-eligibility.yml
+  ci-cd:
     permissions:
-      contents: read
+      contents: write
+      packages: write
       pull-requests: read
-    with:
-      harden-runner-policy: ${{ inputs.harden-runner-policy }}
-      is-release-branch: ${{ inputs.is-release-branch }}
-      force-release: ${{ inputs.force-release }}
-    secrets: inherit
-
-  build-and-test:
-    uses: ./.github/workflows/_dotnet-build-and-test.yml
+    uses: ./.github/workflows/_dotnet-build-test-pack-publish-nuget.yml
     with:
       harden-runner-policy: ${{ inputs.harden-runner-policy }}
       working-directory: ${{ inputs.working-directory }}
       os: ${{ inputs.os }}
       dotnet-version-matrix: ${{ inputs.dotnet-version-matrix }}
       dotnet-version: ${{ inputs.dotnet-version }}
-      codecov-slug: ${{ inputs.codecov-slug }}
-    secrets: inherit
-
-  pack:
-    needs:
-      - build-and-test
-      - get-version
-    uses: ./.github/workflows/_dotnet-build-and-pack.yml
-    with:
-      harden-runner-policy: ${{ inputs.harden-runner-policy }}
-      working-directory: ${{ inputs.working-directory }}
-      os: ${{ inputs.os }}
-      dotnet-version: ${{ inputs.dotnet-version }}
-      package-version: ${{ needs.get-version.outputs.version }}
-      package-artifact-name: "packages"
-      add-assembly-version: ${{ inputs.is-release-branch }}
-
-  publish:
-    needs:
-      - pack
-      - check-release-eligibility
-    permissions:
-      contents: read
-      packages: write
-    uses: ./.github/workflows/_dotnet-publish-nuget.yml
-    with:
-      harden-runner-policy: ${{ inputs.harden-runner-policy }}
-      working-directory: ${{ inputs.working-directory }}
-      os: ${{ inputs.os }}
-      dotnet-version: ${{ inputs.dotnet-version }}
-      package-artifact-name: "packages"
       num-github-prerelease-packages-to-keep: ${{ inputs.num-github-prerelease-packages-to-keep }}
-      upload-to-github: ${{ inputs.is-release-branch == false || needs.check-release-eligibility.outputs.should-release == 'false' }}
-      upload-to-nuget: ${{ inputs.is-release-branch == true && needs.check-release-eligibility.outputs.should-release == 'true' }}
-    secrets: inherit
-
-  release:
-    needs:
-      - publish
-      - get-version
-      - check-release-eligibility
-    if: needs.check-release-eligibility.outputs.should-release == 'true'
-    permissions:
-      contents: write
-    uses: ./.github/workflows/_github-tag-and-release.yml
-    with:
-      harden-runner-policy: ${{ inputs.harden-runner-policy }}
-      version: ${{ needs.get-version.outputs.version }}
+      codecov-slug: ${{ inputs.codecov-slug }}
+      codecov-flag: ${{ codecov-flag }}
+      is-release-branch: ${{ inputs.is-release-branch }}
+      force-release: ${{ inputs.force-release }}
     secrets: inherit

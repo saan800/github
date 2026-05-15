@@ -9,8 +9,8 @@ on:
         type: string
         default: "block"
     secrets:
-      GITHUB_ACCESS_TOKEN:
-        description: "(ie: GITHUB_TOKEN) GitHub token"
+      GITHUB_TOKEN:
+        description: "GitHub token"
         required: true
 
 permissions:
@@ -37,7 +37,7 @@ jobs:
       - name: Validate PR title
         uses: amannn/action-semantic-pull-request@48f256284bd46cdaab1048c3721360e808335d50 # v6.1.1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           # Configure which types are allowed (newline-delimited).
           # Default: https://github.com/commitizen/conventional-commit-types
@@ -96,9 +96,9 @@ jobs:
             api.github.com:443
 
       - name: Ensure Labels Exist
-        uses: actions/github-script@v9
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
         with:
-          github-token: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const labelConfig = {
               breaking:      { color: "b60205", description: "Introduces a breaking change" },
@@ -111,7 +111,8 @@ jobs:
               "help wanted": { color: "0E8A16", description: "Extra attention is needed" },
               invalid:       { color: "e4e669", description: "This doesn't seem right" },
               misc:          { color: "7057ff", description: "Non-functional changes such as performance, tests and refactoring" },
-              "no-release":  { color: "999999", description: "Changes don't require a release and wont be included in the release notes" },
+              "no-release":  { color: "999999", description: "Changes don't require a release" },
+              "no-release-notes": { color: "999999", description: "Changes wont be included in the release notes" },
               question:      { color: "d876e3", description: "Further information is requested" },
               wontfix:       { color: "ffffff", description: "This will not be worked on" },
             };
@@ -141,9 +142,9 @@ jobs:
             }
 
       - name: Label PR
-        uses: actions/github-script@v9
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
         with:
-          github-token: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const pr = context.payload.pull_request;
             const title = pr.title.toLowerCase();

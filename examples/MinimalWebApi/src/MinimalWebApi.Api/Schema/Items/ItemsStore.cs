@@ -25,7 +25,7 @@ public class ItemsStore
                 Name = request.Name,
                 Description = request.Description,
             };
-            _items = [.. _items.Where(x => x.Id != newItem.Id), newItem];
+            _items = [.. _items, newItem];
             return newItem;
         }
     }
@@ -45,9 +45,14 @@ public class ItemsStore
         }
     }
 
-    public void Delete(int id)
+    public bool Delete(int id)
     {
-        lock (_lock) _items = _items.Where(x => x.Id != id).ToList();
+        lock (_lock)
+        {
+            if (!_items.Any(x => x.Id == id)) return false;
+            _items = _items.Where(x => x.Id != id).ToList();
+            return true;
+        }
     }
 
     public void Reset()

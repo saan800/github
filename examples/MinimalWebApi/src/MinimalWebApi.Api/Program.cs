@@ -9,7 +9,6 @@ builder.Services.AddSingleton<ItemsStore>();
 builder.Services.AddControllers();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddEndpointsApiExplorer(); // Required for OpenAPI
 // Microsoft’s built-in OpenAPI generator
 builder.Services.AddOpenApi(o =>
 {
@@ -56,9 +55,7 @@ builder.Services.AddOpenApi(o =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-var isProduction = app.Environment.EnvironmentName.Contains("prod", StringComparison.OrdinalIgnoreCase);
-
-if (!isProduction)
+if (!app.Environment.IsProduction())
 {
     // Enable OpenAPI JSON and Scalar UI
     app.MapOpenApi();

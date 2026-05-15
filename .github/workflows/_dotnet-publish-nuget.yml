@@ -42,8 +42,8 @@ on:
         required: false
         default: false
     secrets:
-      GITHUB_ACCESS_TOKEN:
-        description: "(ie: GITHUB_TOKEN) GitHub token to upload package to GitHub Package Registry. Required if upload-to-github is true"
+      GITHUB_TOKEN:
+        description: "GitHub token to upload package to GitHub Package Registry. Required if upload-to-github is true"
         required: false
       NUGET_API_KEY:
         description: "API key for nuget.org. Required if upload-to-nuget is true"
@@ -95,7 +95,7 @@ jobs:
           dotnet nuget push build-packages/*.nupkg
           --skip-duplicate
           --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
-          --api-key ${{ secrets.GITHUB_ACCESS_TOKEN }}
+          --api-key ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish symbol package(s) to GitHub Package Registry
         if: ${{ inputs.upload-to-github }}
@@ -104,7 +104,7 @@ jobs:
           dotnet nuget push build-packages/*.snupkg
           --skip-duplicate
           --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
-          --api-key ${{ secrets.GITHUB_ACCESS_TOKEN }}
+          --api-key ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish nuget and symbols package(s) to NuGet.org
         if: ${{ inputs.upload-to-nuget }}
@@ -168,7 +168,7 @@ jobs:
       matrix: ${{ fromJson(needs.discover-packages.outputs.matrix) }}
     steps:
       - name: Delete old versions for ${{ matrix.package }}
-        uses: actions/delete-package-versions@v5
+        uses: actions/delete-package-versions@e5bc658cc4c965c472efe991f8beea3981499c55 # v5
         with:
           package-name: ${{ matrix.package }}
           package-type: nuget

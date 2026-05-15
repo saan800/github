@@ -56,5 +56,6 @@ public class TestHttpClientFactory : IDisposable
     {
         if (Provider is IDisposable disposable)
             disposable.Dispose();
+        GC.SuppressFinalize(this);
     }
 }

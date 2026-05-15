@@ -55,7 +55,6 @@ updates:
         patterns:
           - "AwesomeAssertions*"
           - "coverlet*"
-          - "FakeItEasy*"
           - "GitHubActionsTestLogger"
           - "xunit*"
         update-types: ["minor", "patch"]
@@ -83,7 +82,6 @@ updates:
         patterns:
           - "AwesomeAssertions*"
           - "coverlet*"
-          - "FakeItEasy*"
           - "GitHubActionsTestLogger"
           - "xunit*"
         update-types: ["minor", "patch"]

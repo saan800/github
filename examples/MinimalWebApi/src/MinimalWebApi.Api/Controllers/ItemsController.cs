@@ -51,10 +51,11 @@ public class ItemsController(ItemsStore store) : BaseController
 
     [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [EndpointDescription("Deletes the item with the provided id")]
     public IActionResult Delete(int id)
     {
-        store.Delete(id);
+        if (!store.Delete(id)) return NotFound();
         return NoContent();
     }
 }

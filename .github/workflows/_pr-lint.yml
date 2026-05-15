@@ -17,8 +17,8 @@ on:
         required: false
         type: string
     secrets:
-      GITHUB_ACCESS_TOKEN:
-        description: "(ie: GITHUB_TOKEN) GitHub token"
+      GITHUB_TOKEN:
+        description: "GitHub token"
         required: true
 
 permissions:
@@ -50,7 +50,7 @@ jobs:
         uses: super-linter/super-linter@9e863354e3ff62e0727d37183162c4a88873df41 # v8.6.0
         env:
           # To report GitHub Actions status checks
-          GITHUB_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           FILTER_REGEX_EXCLUDE: (./\.editorconfig|\.idea/*|\.vscode/*)
           IGNORE_GENERATED_FILES: true
           # false -> only checks changed files
@@ -65,7 +65,7 @@ jobs:
 
   spell-check:
     runs-on: ubuntu-latest
-    if: ${{ inputs.cspell-config != null }}
+    if: ${{ inputs.cspell-config != '' }}
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@ab7a9404c0f3da075243ca237b5fac12c98deaa5 # v2.19.3

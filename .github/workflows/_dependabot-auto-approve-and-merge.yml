@@ -12,8 +12,8 @@ on:
         required: true
         type: string
     secrets:
-      GITHUB_ACCESS_TOKEN:
-        description: "(ie: GITHUB_TOKEN) GitHub token"
+      GITHUB_TOKEN:
+        description: "GitHub token"
         required: true
 
 jobs:
@@ -28,6 +28,7 @@ jobs:
       - name: Harden Runner
         uses: step-security/harden-runner@ab7a9404c0f3da075243ca237b5fac12c98deaa5 # v2.19.3
         with:
+          disable-sudo: true
           egress-policy: ${{ inputs.harden-runner-policy }}
 
       - name: Checkout
@@ -40,7 +41,7 @@ jobs:
       - name: Check for merge conflicts
         uses: sv-tools/block-merge-conflicts@911859e7a913f086e9f89db5117e0942690bd64e # v2.0.0
         with:
-          token: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Approve a PR if not already approved
         if: ${{ steps.dependabot-metadata.outputs.update-type != 'version-update:semver-major' }}
@@ -52,7 +53,7 @@ jobs:
           fi
         env:
           PR_URL: ${{ inputs.pr-url}}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   merge:
     runs-on: ubuntu-latest
@@ -64,6 +65,7 @@ jobs:
       - name: Harden Runner
         uses: step-security/harden-runner@ab7a9404c0f3da075243ca237b5fac12c98deaa5 # v2.19.3
         with:
+          disable-sudo: true
           egress-policy: ${{ inputs.harden-runner-policy }}
 
       - name: Checkout
@@ -74,4 +76,4 @@ jobs:
         run: gh pr merge --auto --squash "$PR_URL"
         env:
           PR_URL: ${{ inputs.pr-url}}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
