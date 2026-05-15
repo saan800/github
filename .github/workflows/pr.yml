@@ -14,8 +14,7 @@ jobs:
       contents: read
       pull-requests: write
     uses: ./.github/workflows/_pr-labeler.yml
-    secrets:
-      GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    secrets: inherit
 
   pr-lint:
     permissions:
@@ -23,5 +22,4 @@ jobs:
     uses: ./.github/workflows/_pr-lint.yml
     with:
       run-lint: true
-    secrets:
-      GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    secrets: inherit

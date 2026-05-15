@@ -75,3 +75,7 @@ PR titles and commit messages must follow [Conventional Commits](https://www.con
 - Line endings: LF
 - Spelling: en-GB (dictionary overrides in `dictionary.dic`)
 - Max line length: 250 (off for Markdown and YAML)
+
+## Memory
+
+Store all persistent memory in `.claude/agent-memory/MEMORY.md` in this repository. Do not use the default system memory path (`~/.claude/projects/*/memory/`). Use a flat structure with `##` headings per topic — no separate files per memory entry.

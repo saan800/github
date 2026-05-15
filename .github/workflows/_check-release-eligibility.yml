@@ -13,7 +13,7 @@ on:
         required: false
         default: false
     secrets:
-      GITHUB_ACCESS_TOKEN:
+      GITHUB_TOKEN:
         description: "GitHub token"
         required: true
     outputs:
@@ -34,7 +34,7 @@ jobs:
       - name: Determine release eligibility
         id: set-output
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
           SHA: ${{ github.sha }}
           IS_RELEASE_BRANCH: ${{ inputs.is-release-branch }}
@@ -70,3 +70,4 @@ jobs:
           fi
 
           echo "should-release=$should_release" >> $GITHUB_OUTPUT
+          echo "should-release=$should_release"
