@@ -59,7 +59,7 @@ on:
 
 permissions:
   actions: read
-  contents: read
+  contents: write
   packages: write
   pull-requests: write
   security-events: write
@@ -67,7 +67,7 @@ permissions:
 jobs:
   ci-cd:
     permissions:
-      contents: read
+      contents: write
       packages: write
       pull-requests: write
     uses: ./.github/workflows/_dotnet-build-test-pack-publish-nuget.yml
