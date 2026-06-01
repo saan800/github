@@ -70,8 +70,6 @@ if (!app.Environment.IsProduction())
 
 app.UseHttpsRedirection();
 
-//app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();

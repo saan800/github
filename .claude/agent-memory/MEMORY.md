@@ -14,6 +14,9 @@ The test `ATest` in `examples/MinimalWebApi/tests/MinimalWebApi.Tests.Api/Schema
 ### example-pr.yml is-release-branch: false is intentional
 The hardcoded `is-release-branch: false` in `.github/workflows/example-pr.yml` is intentional. This example project must never auto-release to NuGet.org. Do NOT flag the commented-out expression or the hardcoded false as an issue.
 
+### example-pr.yml workflow_dispatch is intentional
+`workflow_dispatch` on `example-pr.yml` (and the commented-out `force-release` input) is by design — it exists for manual testing of the PR workflow. The example must never release to NuGet.org regardless. Do NOT flag `workflow_dispatch` on PR workflows or silently-ignored `force-release` as an issue in example workflows.
+
 ## Project Context
 
 ### Workflow secrets are caller-provided, not repo-owned

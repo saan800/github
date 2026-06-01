@@ -62,7 +62,7 @@ jobs:
               COMMITS=$(gh api repos/$REPO/compare/$LAST_TAG...$SHA --jq '.commits[].commit.message')
             else
               # No previous tag, consider all commits
-              COMMITS=$(gh api repos/$REPO/commits?sha=$SHA --jq '.[].commit.message')
+              COMMITS=$(gh api "repos/$REPO/commits?sha=$SHA" --paginate --jq '.[].commit.message')
             fi
 
             # Extract PR numbers

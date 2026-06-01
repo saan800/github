@@ -113,6 +113,7 @@ jobs:
           --api-key ${{ secrets.NUGET_API_KEY }}
 
   discover-packages:
+    if: inputs.upload-to-github
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
@@ -159,11 +160,20 @@ jobs:
           echo "$json"
 
   cleanup:
+    if: inputs.upload-to-github
     needs: discover-packages
     runs-on: ubuntu-latest
     strategy:
       matrix: ${{ fromJson(needs.discover-packages.outputs.matrix) }}
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@ab7a9404c0f3da075243ca237b5fac12c98deaa5 # v2.19.3
+        with:
+          disable-sudo: true
+          egress-policy: ${{ inputs.harden-runner-policy }}
+          allowed-endpoints: >
+            api.github.com:443
+
       - name: Delete old versions for ${{ matrix.package }}
         uses: actions/delete-package-versions@e5bc658cc4c965c472efe991f8beea3981499c55 # v5
         with:

@@ -35,7 +35,7 @@ public class ItemsController(ItemsStore store) : BaseController
     public IActionResult Create([FromBody] CreateItemRequest request)
     {
         var newItem = store.Add(request);
-        return Created($"/api/items/{newItem.Id}", null);
+        return CreatedAtAction(nameof(GetById), new { id = newItem.Id }, null);
     }
 
     [HttpPatch("{id:int}")]
@@ -46,7 +46,7 @@ public class ItemsController(ItemsStore store) : BaseController
     {
         var updated = store.Patch(id, patchRequest);
         if (!updated) return NotFound();
-        return Accepted($"/api/items/{id}");
+        return AcceptedAtAction(nameof(GetById), new { id = id });
     }
 
     [HttpDelete("{id:int}")]

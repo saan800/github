@@ -90,6 +90,7 @@ jobs:
       dotnet-version-matrix: ${{ inputs.dotnet-version-matrix }}
       dotnet-version: ${{ inputs.dotnet-version }}
       codecov-slug: ${{ inputs.codecov-slug }}
+      codecov-flag: ${{ inputs.codecov-flag }}
     secrets: inherit
 
   pack:
