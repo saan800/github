@@ -1,0 +1,99 @@
+name: scan-codeql
+
+on:
+  workflow_call:
+    inputs:
+      harden-runner-policy:
+        description: "The egress policy for the Harden Runner step. Defaults to 'block'"
+        required: false
+        type: string
+        default: "block"
+      os:
+        required: false
+        type: string
+        default: ubuntu-latest
+      dotnet-version:
+        description: "Dotnet SDK version to use if no matrix is provided"
+        required: false
+        type: string
+        default: 10.0.x
+      language:
+        description: "Language to scan for. eg csharp"
+        required: true
+        type: string
+      timeout-minutes:
+        required: false
+        type: number
+        default: 360
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    name: Analyze (${{ inputs.language }})
+    # Runner size impacts CodeQL analysis time. To learn more, please see:
+    #   - https://gh.io/recommended-hardware-resources-for-running-codeql
+    #   - https://gh.io/supported-runners-and-hardware-resources
+    #   - https://gh.io/using-larger-runners
+    # Consider using larger runners for possible analysis time improvements.
+    runs-on: ${{ inputs.os }}
+    timeout-minutes: ${{ inputs.timeout-minutes }}
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+        with:
+          disable-sudo: true
+          egress-policy: ${{ inputs.harden-runner-policy }}
+          allowed-endpoints: >
+            aka.ms:443
+            api.github.com:443
+            api.nuget.org:443
+            builds.dotnet.microsoft.com:443
+            ci.dot.net:443
+            crl3.digicert.com:80
+            crl4.digicert.com:80
+            dc.services.visualstudio.com:443
+            github.com:443
+            objects.githubusercontent.com:443
+            release-assets.githubusercontent.com:443
+            s.symcb.com:80
+            ts-crl.ws.symantec.com:80
+            uploads.github.com:443
+            www.microsoft.com:80
+
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Setup .NET SDK ${{ inputs.dotnet-version }}
+        if: inputs.language == 'csharp'
+        uses: actions/setup-dotnet@9a946fdbd5fb07b82b2f5a4466058b876ab72bb2 # v5.3.0
+        with:
+          dotnet-version: ${{ inputs.dotnet-version }}
+
+      # Initializes the CodeQL tools for scanning.
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@7211b7c8077ea37d8641b6271f6a365a22a5fbfa # v4.36.0
+        with:
+          languages: ${{ inputs.language }}
+          build-mode: autobuild
+          # If you wish to specify custom queries, you can do so here or in a config file.
+          # By default, queries listed here will override any specified in a config file.
+          # Prefix the list here with "+" to use these queries and those in the config file.
+
+          # For more details on CodeQL's query packs, refer to: https://docs.github.com/en/code-security/code-scanning/automatically-scanning-your-code-for-vulnerabilities-and-errors/configuring-code-scanning#using-queries-in-ql-packs
+          # queries: security-extended,security-and-quality
+
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@7211b7c8077ea37d8641b6271f6a365a22a5fbfa # v4.36.0
+        with:
+          category: "/language:${{inputs.language}}"
