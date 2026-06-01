@@ -58,9 +58,11 @@ on:
         required: false
 
 permissions:
+  actions: read
   contents: write
   packages: write
   pull-requests: write
+  security-events: write
 
 jobs:
   ci-cd:
@@ -108,7 +110,9 @@ jobs:
 
   scan-codeql:
     permissions:
+      actions: read
       contents: read
+      security-events: write
     uses: ./.github/workflows/_scan-codeql.yml
     with:
       harden-runner-policy: ${{ inputs.harden-runner-policy }}
