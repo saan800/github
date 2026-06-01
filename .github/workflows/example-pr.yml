@@ -21,7 +21,7 @@ jobs:
   dotnet-package-pr:
     permissions:
       actions: read
-      contents: write
+      contents: read
       packages: write
       pull-requests: write
       security-events: write
@@ -37,7 +37,7 @@ jobs:
   dotnet-minimal-web-api-pr:
     permissions:
       actions: read
-      contents: write
+      contents: read
       pull-requests: write
       security-events: write
     uses: ./.github/workflows/dotnet-pr.yml

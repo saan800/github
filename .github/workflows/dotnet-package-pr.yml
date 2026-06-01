@@ -67,7 +67,7 @@ permissions:
 jobs:
   ci-cd:
     permissions:
-      contents: write
+      contents: read
       packages: write
       pull-requests: write
     uses: ./.github/workflows/_dotnet-build-test-pack-publish-nuget.yml
@@ -104,6 +104,8 @@ jobs:
     secrets: inherit
 
   dependency-review:
+    permissions:
+      contents: read
     uses: ./.github/workflows/_dependency-review.yml
     with:
       harden-runner-policy: ${{ inputs.harden-runner-policy }}
