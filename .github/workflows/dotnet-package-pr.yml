@@ -69,14 +69,14 @@ on:
 permissions:
   contents: write
   packages: write
-  pull-requests: read
+  pull-requests: write
 
 jobs:
   ci-cd:
     permissions:
       contents: write
       packages: write
-      pull-requests: read
+      pull-requests: write
     uses: ./.github/workflows/_dotnet-build-test-pack-publish-nuget.yml
     with:
       harden-runner-policy: ${{ inputs.harden-runner-policy }}
