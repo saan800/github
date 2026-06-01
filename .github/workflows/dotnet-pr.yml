@@ -58,8 +58,10 @@ on:
         required: false
 
 permissions:
+  actions: read
   contents: write
   pull-requests: write
+  security-events: write
 
 jobs:
   ci-cd:
@@ -74,7 +76,6 @@ jobs:
       dotnet-version: ${{ inputs.dotnet-version }}
       codecov-slug: ${{ inputs.codecov-slug }}
       codecov-flag: ${{ inputs.codecov-flag }}
-    secrets: inherit
 
   pr-labels:
     permissions:
@@ -99,3 +100,15 @@ jobs:
     uses: ./.github/workflows/_dependency-review.yml
     with:
       harden-runner-policy: ${{ inputs.harden-runner-policy }}
+
+  scan-codeql:
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    uses: ./.github/workflows/_scan-codeql.yml
+    with:
+      harden-runner-policy: ${{ inputs.harden-runner-policy }}
+      os: ${{ inputs.os }}
+      dotnet-version: ${{ inputs.dotnet-version }}
+      language: csharp

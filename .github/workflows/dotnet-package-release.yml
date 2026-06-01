@@ -82,3 +82,13 @@ jobs:
       is-release-branch: ${{ inputs.is-release-branch }}
       force-release: ${{ inputs.force-release }}
     secrets: inherit
+
+  scan-codeql:
+    permissions:
+      contents: read
+    uses: ./.github/workflows/_scan-codeql.yml
+    with:
+      harden-runner-policy: ${{ inputs.harden-runner-policy }}
+      os: ${{ inputs.os }}
+      dotnet-version: ${{ inputs.dotnet-version }}
+      language: csharp

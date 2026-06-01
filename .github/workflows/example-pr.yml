@@ -11,16 +11,20 @@ on:
         default: false
 
 permissions:
+  actions: read
   contents: read
   packages: write
   pull-requests: write
+  security-events: write
 
 jobs:
   dotnet-package-pr:
     permissions:
+      actions: read
       contents: write
       packages: write
       pull-requests: write
+      security-events: write
     uses: ./.github/workflows/dotnet-package-pr.yml
     with:
       working-directory: "./examples/NugetPackages"
@@ -32,8 +36,10 @@ jobs:
 
   dotnet-minimal-web-api-pr:
     permissions:
+      actions: read
       contents: write
       pull-requests: write
+      security-events: write
     uses: ./.github/workflows/dotnet-pr.yml
     with:
       working-directory: "./examples/MinimalWebApi"
