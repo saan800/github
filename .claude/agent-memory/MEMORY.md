@@ -11,8 +11,8 @@ NuGet Dependabot PRs in `dependabot.yml` intentionally omit the `no-release` lab
 ### ItemTests.ATest is an intentional placeholder
 The test `ATest` in `examples/MinimalWebApi/tests/MinimalWebApi.Tests.Api/Schema/ItemTests.cs` is a deliberate minimal placeholder — the example project needs at least one unit test to exercise the CI pipeline. Do NOT flag it as trivial, low-quality, or missing real assertions.
 
-### example-nuget-packages.yml is-release-branch: false is intentional
-The hardcoded `is-release-branch: false` in `.github/workflows/example-nuget-packages.yml` is intentional. This example project must never auto-release to NuGet.org. Do NOT flag the commented-out expression or the hardcoded false as an issue.
+### example-pr.yml is-release-branch: false is intentional
+The hardcoded `is-release-branch: false` in `.github/workflows/example-pr.yml` is intentional. This example project must never auto-release to NuGet.org. Do NOT flag the commented-out expression or the hardcoded false as an issue.
 
 ## Project Context
 
