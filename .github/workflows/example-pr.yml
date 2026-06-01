@@ -34,6 +34,9 @@ jobs:
     secrets: inherit
 
   dotnet-minimal-web-api-pr:
+    permissions:
+      contents: write
+      pull-requests: write
     uses: ./.github/workflows/dotnet-pr.yml
     with:
       working-directory: "./examples/MinimalWebApi"
