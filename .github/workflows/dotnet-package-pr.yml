@@ -78,6 +78,8 @@ jobs:
       num-github-prerelease-packages-to-keep: ${{ inputs.num-github-prerelease-packages-to-keep }}
       codecov-slug: ${{ inputs.codecov-slug }}
       codecov-flag: ${{ inputs.codecov-flag }}
+      is-release-branch: false
+      force-release: false
     secrets: inherit
 
   pr-labels:
