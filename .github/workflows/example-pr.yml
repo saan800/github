@@ -34,7 +34,7 @@ jobs:
     secrets: inherit
 
   dotnet-minimal-web-api-pr:
-    uses: ./.github/workflows/_dotnet-build-and-test.yml
+    uses: ./.github/workflows/dotnet-pr.yml
     with:
       working-directory: "./examples/MinimalWebApi"
       os: "ubuntu-latest"
