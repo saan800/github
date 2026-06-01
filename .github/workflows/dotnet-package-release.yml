@@ -78,7 +78,7 @@ jobs:
       dotnet-version: ${{ inputs.dotnet-version }}
       num-github-prerelease-packages-to-keep: ${{ inputs.num-github-prerelease-packages-to-keep }}
       codecov-slug: ${{ inputs.codecov-slug }}
-      codecov-flag: ${{ codecov-flag }}
+      codecov-flag: ${{ inputs.codecov-flag }}
       is-release-branch: ${{ inputs.is-release-branch }}
       force-release: ${{ inputs.force-release }}
     secrets: inherit
