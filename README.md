@@ -64,10 +64,6 @@ Determines whether a release should be published by inspecting PR labels. A rele
 | `is-release-branch` | Yes | | `true` when running on the release branch |
 | `force-release` | | `false` | Override all label checks and always release |
 
-| Secret | Required | Description |
-|---|---|---|
-| `GITHUB_TOKEN` | Yes | Token to query PR labels |
-
 Outputs: `should-release` (`true` / `false`).
 
 ---
@@ -87,7 +83,6 @@ Downloads a packed artifact and publishes to GitHub Package Registry (prerelease
 
 | Secret | Required | Description |
 |---|---|---|
-| `GITHUB_ACCESS_TOKEN` | | Token for GPR. Required if `upload-to-github` is `true` |
 | `NUGET_API_KEY` | | API key for NuGet.org. Required if `upload-to-nuget` is `true` |
 
 ---
@@ -99,10 +94,6 @@ Creates an annotated git tag and a GitHub release with auto-generated release no
 | Input | Required | Default | Description |
 |---|---|---|---|
 | `version` | Yes | | Version string without `v` prefix (e.g. `1.2.3`) |
-
-| Secret | Required | Description |
-|---|---|---|
-| `GITHUB_TOKEN` | Yes | Token to create the tag and release |
 
 ---
 
@@ -126,11 +117,11 @@ get-version ─┬─ check-release-eligibility
 | `dotnet-version-matrix` | | | JSON matrix for the build-and-test job |
 | `os` | | `ubuntu-latest` | Runner OS |
 | `codecov-slug` | | | Codecov repo slug |
+| `codecov-flag` | | `unittests` | Codecov flag |
 | `num-github-prerelease-packages-to-keep` | | `50` | GPR cleanup retention count |
 
 | Secret | Required | Description |
 |---|---|---|
-| `GITHUB_ACCESS_TOKEN` | Yes | Token for GPR and release creation |
 | `NUGET_API_KEY` | | API key for NuGet.org releases |
 | `CODECOV_TOKEN` | | Token for Codecov |
 
@@ -148,7 +139,6 @@ jobs:
       working-directory: "./src/MyPackage"
       is-release-branch: ${{ github.ref == 'refs/heads/main' }}
     secrets:
-      GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
 ```
 
@@ -160,10 +150,6 @@ jobs:
 
 Validates PR titles against [Conventional Commits](https://www.conventionalcommits.org/) and applies labels automatically. Creates any missing labels on first run.
 
-| Secret | Required | Description |
-|---|---|---|
-| `GITHUB_TOKEN` | Yes | Token to read/write PR labels |
-
 #### `_pr-lint.yml`
 
 Runs [super-linter](https://github.com/super-linter/super-linter) (C#, YAML, GitHub Actions) against changed files. Optionally runs [cspell](https://cspell.org/) spell-checking.
@@ -173,10 +159,6 @@ Runs [super-linter](https://github.com/super-linter/super-linter) (C#, YAML, Git
 | `run-lint` | | `false` | Enable super-linter |
 | `cspell-config` | | | Path to cspell config file. Spell-checking is skipped if omitted |
 
-| Secret | Required | Description |
-|---|---|---|
-| `GITHUB_TOKEN` | Yes | Token for status checks |
-
 #### `_dependabot-auto-approve-and-merge.yml`
 
 Auto-approves and squash-merges Dependabot PRs for non-major updates. Blocks on merge conflicts.
@@ -184,10 +166,6 @@ Auto-approves and squash-merges Dependabot PRs for non-major updates. Blocks on 
 | Input | Required | Description |
 |---|---|---|
 | `pr-url` | Yes | URL of the Dependabot PR |
-
-| Secret | Required | Description |
-|---|---|---|
-| `GITHUB_TOKEN` | Yes | Token to approve and merge |
 
 ---
 
