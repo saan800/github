@@ -104,6 +104,8 @@ jobs:
     secrets: inherit
 
   dependency-review:
+    permissions:
+      contents: read
     uses: ./.github/workflows/_dependency-review.yml
     with:
       harden-runner-policy: ${{ inputs.harden-runner-policy }}
