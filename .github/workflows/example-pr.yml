@@ -5,7 +5,7 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch: # 👈 manual trigger here to release
+  workflow_dispatch: # 👈 manual trigger here to release - should only be on "release" workflows, not "pr" workflows
     inputs:
       force-release:
         description: "Force a release regardless of PR labels or branch"
@@ -19,7 +19,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  ci-cd:
+  dotnet-package-pr:
     permissions:
       contents: write
       packages: write
@@ -31,4 +31,12 @@ jobs:
       dotnet-version: 10.0.x
       is-release-branch: false # ${{ github.ref == 'refs/heads/main' }}
       force-release: ${{ github.event.inputs.force-release || false }}
+    secrets: inherit
+
+  dotnet-minimal-web-api-pr:
+    uses: ./.github/workflows/_dotnet-build-and-test.yml
+    with:
+      working-directory: "./examples/MinimalWebApi"
+      os: "ubuntu-latest"
+      dotnet-version: "10.0.x"
     secrets: inherit
