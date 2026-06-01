@@ -16,11 +16,6 @@ on:
         description: "Path to the cspell configuration file. Required to run spell-checking. eg '.cspell.json'"
         required: false
         type: string
-    secrets:
-      GITHUB_TOKEN:
-        description: "GitHub token"
-        required: true
-
 permissions:
   contents: read
 

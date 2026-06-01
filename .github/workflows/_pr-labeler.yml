@@ -8,11 +8,6 @@ on:
         required: false
         type: string
         default: "block"
-    secrets:
-      GITHUB_TOKEN:
-        description: "GitHub token"
-        required: true
-
 permissions:
   contents: read
   pull-requests: read

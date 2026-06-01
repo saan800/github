@@ -13,3 +13,8 @@ The test `ATest` in `examples/MinimalWebApi/tests/MinimalWebApi.Tests.Api/Schema
 
 ### example-nuget-packages.yml is-release-branch: false is intentional
 The hardcoded `is-release-branch: false` in `.github/workflows/example-nuget-packages.yml` is intentional. This example project must never auto-release to NuGet.org. Do NOT flag the commented-out expression or the hardcoded false as an issue.
+
+## Project Context
+
+### Workflow secrets are caller-provided, not repo-owned
+The secrets declared in `workflow_call.secrets:` blocks (e.g. `GITHUB_TOKEN`, `NUGET_API_KEY`, `CODECOV_TOKEN`) represent tokens that **calling repositories** provide when they consume these workflow templates — they are not secrets belonging to this repo. When analysing or fixing secrets-related issues, account for the fact that these workflows are reusable templates consumed by other GitHub projects, and the tokens are scoped to those caller repos.

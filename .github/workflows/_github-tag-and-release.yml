@@ -12,11 +12,6 @@ on:
         description: "Version number to tag and release (without the 'v' prefix)"
         required: true
         type: string
-    secrets:
-      GITHUB_TOKEN:
-        description: "GitHub token to upload tag and release with"
-        required: true
-
 permissions:
   contents: read
 

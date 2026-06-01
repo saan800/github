@@ -51,9 +51,6 @@ on:
         required: false
         default: false
     secrets:
-      GITHUB_TOKEN:
-        description: "GitHub token"
-        required: true
       NUGET_API_KEY:
         description: "API key for nuget.org. Required if upload-to-nuget is true"
         required: false

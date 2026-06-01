@@ -17,10 +17,6 @@ on:
         type: boolean
         required: false
         default: false
-    secrets:
-      GITHUB_TOKEN:
-        description: "GitHub token"
-        required: true
     outputs:
       should-release:
         description: "Boolean indicating if release should happen"
