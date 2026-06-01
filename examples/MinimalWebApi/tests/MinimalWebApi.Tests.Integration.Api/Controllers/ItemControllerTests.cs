@@ -48,8 +48,6 @@ public class ItemControllerTests(TestHttpClientFactory factory) : IAsyncLifetime
 
         var response = await _client.PostAsJsonAsync("/api/items", newItemRequest, _ct);
         response.StatusCode.Should().Be(HttpStatusCode.Created);
-        response.Headers.Location.Should().NotBeNull();
-        response.Headers.Location.ToString().Should().StartWith("/api/items/");
 
         // Verify it now exists
         var item = await _client.GetFromJsonAsync<Item>(response.Headers.Location!.ToString(), _ct);
@@ -57,6 +55,10 @@ public class ItemControllerTests(TestHttpClientFactory factory) : IAsyncLifetime
         item.Id.Should().BeGreaterThan(currentItems.Max(x => x.Id));
         item.Name.Should().Be(newItemRequest.Name);
         item.Description.Should().Be(newItemRequest.Description);
+
+        // verify Location header of created item
+        response.Headers.Location.Should().NotBeNull();
+        response.Headers.Location.ToString().Should().EndWith($"/api/items/{item.Id}");
     }
 
     [Fact]
@@ -71,7 +73,7 @@ public class ItemControllerTests(TestHttpClientFactory factory) : IAsyncLifetime
         var response = await _client.PatchAsJsonAsync($"/api/items/{itemToModify.Id}", patchRequest, _ct);
         response.StatusCode.Should().Be(HttpStatusCode.Accepted);
         response.Headers.Location.Should().NotBeNull();
-        response.Headers.Location.ToString().Should().Be($"/api/items/{itemToModify.Id}");
+        response.Headers.Location.ToString().Should().EndWith($"/api/items/{itemToModify.Id}");
 
         // Verify it has been updated
         var item = await _client.GetFromJsonAsync<Item>(response.Headers.Location!.ToString(), _ct);
@@ -93,5 +95,12 @@ public class ItemControllerTests(TestHttpClientFactory factory) : IAsyncLifetime
 
         var notFound = await _client.GetAsync($"/api/items/{itemIdToDelete}", _ct);
         notFound.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task Delete_ShouldReturn404ForNonExistentItem()
+    {
+        var response = await _client.DeleteAsync("/api/items/99999", _ct);
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 }

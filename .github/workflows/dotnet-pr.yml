@@ -1,4 +1,4 @@
-name: dotnet-build-test-pack-publish-nuget
+name: dotnet-pr
 
 on:
   workflow_call:
@@ -27,6 +27,14 @@ on:
         required: false
         type: string
         default: 10.0.x
+      run-lint:
+        required: false
+        type: boolean
+        default: false
+      cspell-config:
+        description: "Path to the cspell configuration file. Required to run spell-checking. eg '.cspell.json'"
+        required: false
+        type: string
       num-github-prerelease-packages-to-keep:
         description: "We cleanup github prerelease nuget packages. Configure how many to keep"
         type: number
@@ -41,15 +49,6 @@ on:
         required: false
         type: string
         default: unittests
-      is-release-branch:
-        description: 'If its a release branch or not. eg release from main check would be "github.ref==''refs/heads/main''" '
-        type: boolean
-        required: true
-      force-release:
-        description: "Force a release regardless of PR labels or branch"
-        type: boolean
-        required: false
-        default: false
     secrets:
       NUGET_API_KEY:
         description: "API key for nuget.org. Required if upload-to-nuget is true"
@@ -60,28 +59,12 @@ on:
 
 permissions:
   contents: write
-  packages: write
-  pull-requests: read
+  pull-requests: write
 
 jobs:
-  get-version:
-    uses: ./.github/workflows/_version.yml
-    with:
-      harden-runner-policy: ${{ inputs.harden-runner-policy }}
-      is-release-branch: ${{ inputs.is-release-branch }}
-
-  check-release-eligibility:
-    uses: ./.github/workflows/_check-release-eligibility.yml
+  ci-cd:
     permissions:
       contents: read
-      pull-requests: read
-    with:
-      harden-runner-policy: ${{ inputs.harden-runner-policy }}
-      is-release-branch: ${{ inputs.is-release-branch }}
-      force-release: ${{ inputs.force-release }}
-    secrets: inherit
-
-  build-and-test:
     uses: ./.github/workflows/_dotnet-build-and-test.yml
     with:
       harden-runner-policy: ${{ inputs.harden-runner-policy }}
@@ -93,49 +76,26 @@ jobs:
       codecov-flag: ${{ inputs.codecov-flag }}
     secrets: inherit
 
-  pack:
-    needs:
-      - build-and-test
-      - get-version
-    uses: ./.github/workflows/_dotnet-build-and-pack.yml
-    with:
-      harden-runner-policy: ${{ inputs.harden-runner-policy }}
-      working-directory: ${{ inputs.working-directory }}
-      os: ${{ inputs.os }}
-      dotnet-version: ${{ inputs.dotnet-version }}
-      package-version: ${{ needs.get-version.outputs.version }}
-      package-artifact-name: "packages"
-      add-assembly-version: ${{ inputs.is-release-branch }}
-
-  publish:
-    needs:
-      - pack
-      - check-release-eligibility
+  pr-labels:
     permissions:
       contents: read
-      packages: write
-    uses: ./.github/workflows/_dotnet-publish-nuget.yml
+      pull-requests: write
+    uses: ./.github/workflows/_pr-labeler.yml
     with:
       harden-runner-policy: ${{ inputs.harden-runner-policy }}
-      working-directory: ${{ inputs.working-directory }}
-      os: ${{ inputs.os }}
-      dotnet-version: ${{ inputs.dotnet-version }}
-      package-artifact-name: "packages"
-      num-github-prerelease-packages-to-keep: ${{ inputs.num-github-prerelease-packages-to-keep }}
-      upload-to-github: ${{ inputs.is-release-branch == false || needs.check-release-eligibility.outputs.should-release == 'false' }}
-      upload-to-nuget: ${{ inputs.is-release-branch == true && needs.check-release-eligibility.outputs.should-release == 'true' }}
     secrets: inherit
 
-  release:
-    needs:
-      - publish
-      - get-version
-      - check-release-eligibility
-    if: needs.check-release-eligibility.outputs.should-release == 'true'
+  pr-lint:
     permissions:
-      contents: write
-    uses: ./.github/workflows/_github-tag-and-release.yml
+      contents: read
+    uses: ./.github/workflows/_pr-lint.yml
     with:
       harden-runner-policy: ${{ inputs.harden-runner-policy }}
-      version: ${{ needs.get-version.outputs.version }}
+      run-lint: ${{ inputs.run-lint }}
+      cspell-config: ${{ inputs.cspell-config }}
     secrets: inherit
+
+  dependency-review:
+    uses: ./.github/workflows/_dependency-review.yml
+    with:
+      harden-runner-policy: ${{ inputs.harden-runner-policy }}

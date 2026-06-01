@@ -1,7 +1,7 @@
 <Project>
 
   <PropertyGroup>
-    <TargetFrameworks>net10.0</TargetFrameworks>
+    <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <!-- Central Package Management -->
@@ -32,8 +32,9 @@
   </PropertyGroup>
 
   <PropertyGroup>
+    <IsTestProject Condition="$(MSBuildProjectName.Contains('.Tests.'))">true</IsTestProject>
+    <IsTestProject Condition="$(MSBuildProjectName.EndsWith('.Tests'))">true</IsTestProject>
     <IsTestProject Condition="'$(IsTestProject)' == ''">false</IsTestProject>
-    <IsTestProject Condition="$(MSBuildProjectName.StartsWith('NugetPackages.Tests.'))">true</IsTestProject>
     <IsPackable Condition="'$(IsTestProject)' == 'true'">false</IsPackable>
     <IsPackable Condition="'$(IsPackable)' == ''">false</IsPackable>
   </PropertyGroup>

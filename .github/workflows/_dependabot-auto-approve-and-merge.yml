@@ -11,11 +11,6 @@ on:
       pr-url:
         required: true
         type: string
-    secrets:
-      GITHUB_ACCESS_TOKEN:
-        description: "(ie: GITHUB_TOKEN) GitHub token"
-        required: true
-
 jobs:
   approve:
     runs-on: ubuntu-latest
@@ -28,7 +23,11 @@ jobs:
       - name: Harden Runner
         uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
         with:
+          disable-sudo: true
           egress-policy: ${{ inputs.harden-runner-policy }}
+          allowed-endpoints: >
+            api.github.com:443
+            github.com:443
 
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -40,19 +39,19 @@ jobs:
       - name: Check for merge conflicts
         uses: sv-tools/block-merge-conflicts@911859e7a913f086e9f89db5117e0942690bd64e # v2.0.0
         with:
-          token: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Approve a PR if not already approved
         if: ${{ steps.dependabot-metadata.outputs.update-type != 'version-update:semver-major' }}
         run: |
           gh pr checkout "$PR_URL" # sets the upstream metadata for `gh pr status`
           if [ "$(gh pr status --json reviewDecision -q .currentBranch.reviewDecision)" != "APPROVED" ];
-          then gh pr review --approve "$PR_URL" && gh pr merge --auto --squash "${PR_URL}"
+          then gh pr review --approve "$PR_URL"
           else echo "PR already approved, skipping additional approvals to minimize emails/notification noise.";
           fi
         env:
           PR_URL: ${{ inputs.pr-url}}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   merge:
     runs-on: ubuntu-latest
@@ -64,7 +63,11 @@ jobs:
       - name: Harden Runner
         uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
         with:
+          disable-sudo: true
           egress-policy: ${{ inputs.harden-runner-policy }}
+          allowed-endpoints: >
+            api.github.com:443
+            github.com:443
 
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -74,4 +77,4 @@ jobs:
         run: gh pr merge --auto --squash "$PR_URL"
         env:
           PR_URL: ${{ inputs.pr-url}}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

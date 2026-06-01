@@ -17,6 +17,12 @@ changelog:
     - title: Dependency Updates 🎳
       labels:
         - dependencies
+    - title: Documentation 📖
+      labels:
+        - documentation
+    - title: Configuration & CI ⚙️
+      labels:
+        - configuration
     - title: Other 📝
       labels:
         - "*"

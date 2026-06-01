@@ -3,6 +3,11 @@ name: check-release-eligibility
 on:
   workflow_call:
     inputs:
+      harden-runner-policy:
+        description: "The egress policy for the Harden Runner step. Defaults to 'block'"
+        required: false
+        type: string
+        default: "block"
       is-release-branch:
         description: "If this is a release branch (e.g., main)"
         type: boolean
@@ -12,10 +17,6 @@ on:
         type: boolean
         required: false
         default: false
-    secrets:
-      GITHUB_ACCESS_TOKEN:
-        description: "GitHub token"
-        required: true
     outputs:
       should-release:
         description: "Boolean indicating if release should happen"
@@ -31,10 +32,18 @@ jobs:
     outputs:
       should-release: ${{ steps.set-output.outputs.should-release }}
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@ab7a9404c0f3da075243ca237b5fac12c98deaa5 # v2.19.3
+        with:
+          disable-sudo: true
+          egress-policy: ${{ inputs.harden-runner-policy }}
+          allowed-endpoints: >
+            api.github.com:443
+
       - name: Determine release eligibility
         id: set-output
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
           SHA: ${{ github.sha }}
           IS_RELEASE_BRANCH: ${{ inputs.is-release-branch }}
@@ -53,20 +62,28 @@ jobs:
               COMMITS=$(gh api repos/$REPO/compare/$LAST_TAG...$SHA --jq '.commits[].commit.message')
             else
               # No previous tag, consider all commits
-              COMMITS=$(gh api repos/$REPO/commits?sha=$SHA --jq '.[].commit.message')
+              COMMITS=$(gh api "repos/$REPO/commits?sha=$SHA" --paginate --jq '.[].commit.message')
             fi
 
             # Extract PR numbers
             PRS=$(echo "$COMMITS" | grep -oE '#[0-9]+' | sort -u | tr -d '#')
 
-            # Check labels of each PR
-            for pr in $PRS; do
-              LABELS=$(gh api repos/$REPO/pulls/$pr --jq '.labels[].name')
-              if ! echo "$LABELS" | grep -q "no-release"; then
+            if [ -z "$PRS" ]; then
+              # Commits exist but no PR references found - release by default
+              if [ -n "$COMMITS" ]; then
                 should_release=true
-                break
               fi
-            done
+            else
+              # Check labels of each PR
+              for pr in $PRS; do
+                LABELS=$(gh api repos/$REPO/pulls/$pr --jq '.labels[].name')
+                if ! echo "$LABELS" | grep -q "no-release"; then
+                  should_release=true
+                  break
+                fi
+              done
+            fi
           fi
 
           echo "should-release=$should_release" >> $GITHUB_OUTPUT
+          echo "should-release=$should_release"
