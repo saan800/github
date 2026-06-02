@@ -16,19 +16,6 @@ on:
         required: false
         type: string
         default: ubuntu-latest
-      dotnet-version:
-        description: "Dotnet SDK version to use if no matrix is provided"
-        required: false
-        type: string
-        default: 10.0.x
-      language:
-        description: "Language to scan for. eg csharp"
-        required: true
-        type: string
-      timeout-minutes:
-        required: false
-        type: number
-        default: 360
 
 # Declare default permissions as read only.
 permissions: read-all
