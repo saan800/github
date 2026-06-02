@@ -58,11 +58,9 @@ on:
         required: false
 
 permissions:
-  actions: read
   contents: write
   packages: write
   pull-requests: write
-  security-events: write
 
 jobs:
   ci-cd:
