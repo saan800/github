@@ -29,6 +29,7 @@ on:
 permissions:
   actions: read
   contents: read
+  packages: read
   security-events: write
 
 jobs:
@@ -42,8 +43,14 @@ jobs:
     runs-on: ${{ inputs.os }}
     timeout-minutes: ${{ inputs.timeout-minutes }}
     permissions:
+      # only required for workflows in private repositories
       actions: read
       contents: read
+
+      # required to fetch internal or private CodeQL packs
+      packages: read
+
+      # required for all workflows
       security-events: write
 
     strategy:
