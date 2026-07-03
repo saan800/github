@@ -1,5 +1,8 @@
 # github
 
+[![codecov](https://codecov.io/gh/saan800/github/graph/badge.svg?token=WWF9NNOGJ0)](https://codecov.io/gh/saan800/github)
+
+
 Reusable GitHub Actions workflow templates for .NET projects, with reference example implementations.
 
 ## Reusable Workflow Templates
