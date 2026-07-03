@@ -17,8 +17,16 @@ on:
         type: string
         default: ubuntu-latest
 
-# Declare default permissions as read only.
-permissions: read-all
+# Declare default permissions to match exactly what the `analysis` job below
+# requires. Reusable-workflow callers must grant at least this set on the
+# calling job, or GitHub Actions rejects the call - `read-all` was too broad
+# here since it expands to every permission scope (packages, issues, pages,
+# etc.), none of which this workflow actually uses.
+permissions:
+  security-events: write
+  id-token: write
+  contents: read
+  actions: read
 
 jobs:
   analysis:
