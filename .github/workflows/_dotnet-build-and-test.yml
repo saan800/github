@@ -97,7 +97,7 @@ jobs:
             auth.docker.io:443
             builds.dotnet.microsoft.com:443
             cli.codecov.io:443
-            ingest.codecov.io:433
+            ingest.codecov.io:443
             dotnetcli.azureedge.net:443
             cognito-identity.us-east-1.amazonaws.com:443
             crl.sectigo.com:443
@@ -105,6 +105,7 @@ jobs:
             crl4.digicert.com:443
             dc.services.visualstudio.com:443
             github.com:443
+            keybase.io:443
             ocsp.digicert.com:443
             ocsp.sectigo.com:443
             pinpoint.us-east-1.amazonaws.com:443
