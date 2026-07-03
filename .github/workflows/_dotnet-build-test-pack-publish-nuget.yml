@@ -32,8 +32,8 @@ on:
         type: number
         required: false
         default: 50
-      codecov-slug:
-        description: "Slug to upload code coverage results for Codecov. e.g. saan800/saansoft-correlationId"
+      codecov-name:
+        description: "Name to upload code coverage results for Codecov. e.g. saansoft-correlationId"
         required: false
         type: string
       codecov-flag:
@@ -55,7 +55,7 @@ on:
         description: "API key for nuget.org. Required if upload-to-nuget is true"
         required: false
       CODECOV_TOKEN:
-        description: "Token for CodeCov. Required if codecov-slug is set"
+        description: "Token for CodeCov. Required if codecov-name is set"
         required: false
 
 permissions:
@@ -89,7 +89,7 @@ jobs:
       os: ${{ inputs.os }}
       dotnet-version-matrix: ${{ inputs.dotnet-version-matrix }}
       dotnet-version: ${{ inputs.dotnet-version }}
-      codecov-slug: ${{ inputs.codecov-slug }}
+      codecov-name: ${{ inputs.codecov-name }}
       codecov-flag: ${{ inputs.codecov-flag }}
     secrets: inherit
 

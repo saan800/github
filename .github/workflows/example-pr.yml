@@ -30,6 +30,7 @@ jobs:
       working-directory: "./examples/NugetPackages"
       os: ubuntu-latest
       dotnet-version: 10.0.x
+      codecov-name: "example-dotnet-package"
       # is-release-branch: ${{ github.ref == 'refs/heads/main' }} for "release" workflows only
       # force-release: ${{ github.event.inputs.force-release || false }} for "release" workflows only
     secrets: inherit
@@ -45,4 +46,5 @@ jobs:
       working-directory: "./examples/MinimalWebApi"
       os: "ubuntu-latest"
       dotnet-version: "10.0.x"
+      codecov-name: "example-minimal-web-api"
     secrets: inherit

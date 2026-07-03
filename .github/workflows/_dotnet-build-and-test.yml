@@ -26,8 +26,8 @@ on:
         required: false
         type: string
         default: 10.0.x
-      codecov-slug:
-        description: "Slug to upload code coverage results for Codecov. e.g. saan800/saansoft-correlationId"
+      codecov-name:
+        description: "Name to upload code coverage results for Codecov. e.g. saansoft-correlationId"
         required: false
         type: string
       codecov-flag:
@@ -187,10 +187,10 @@ jobs:
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
-        if: inputs.codecov-slug != ''
+        if: inputs.codecov-name != ''
         with:
+          fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: ./reports/coverage/
-          fail_ci_if_error: false
           flags: ${{ inputs.codecov-flag }}, ${{ matrix.dotnet-version }}, ${{ inputs.os }}
-          slug: ${{ inputs.codecov-slug }}
+          name: ${{ inputs.codecov-name }}
