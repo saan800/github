@@ -194,3 +194,4 @@ jobs:
           directory: ./reports/coverage/
           flags: ${{ inputs.codecov-flag }}, ${{ matrix.dotnet-version }}, ${{ inputs.os }}
           name: ${{ inputs.codecov-name }}
+          verbose: true
