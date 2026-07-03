@@ -1,4 +1,4 @@
-name: example-pr
+name: example-release
 
 on:
   push:
