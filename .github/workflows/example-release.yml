@@ -4,8 +4,9 @@ on:
   push:
     branches:
       - main
-    paths:
-      - "src/**"
+    # would normally filter to only paths that actually want to release for
+    # paths:
+    #   - "src/**"
   workflow_dispatch: # 👈 manual trigger here to release
     inputs:
       force-release:
