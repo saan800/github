@@ -40,7 +40,7 @@ updates:
       prefix: "dependencies(nuget): "
     labels:
       - "dependencies"
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 10
     allow:
       - dependency-type: direct
       - dependency-type: indirect
@@ -54,7 +54,6 @@ updates:
       testing:
         patterns:
           - "AwesomeAssertions*"
-          - "coverlet*"
           - "GitHubActionsTestLogger"
           - "xunit*"
         update-types: ["minor", "patch"]
@@ -67,7 +66,7 @@ updates:
       prefix: "dependencies(nuget): "
     labels:
       - "dependencies"
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 10
     allow:
       - dependency-type: direct
       - dependency-type: indirect
@@ -81,7 +80,6 @@ updates:
       testing:
         patterns:
           - "AwesomeAssertions*"
-          - "coverlet*"
           - "GitHubActionsTestLogger"
           - "xunit*"
         update-types: ["minor", "patch"]

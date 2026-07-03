@@ -1,5 +1,8 @@
 # github
 
+[![codecov](https://codecov.io/gh/saan800/github/graph/badge.svg?token=WWF9NNOGJ0)](https://codecov.io/gh/saan800/github)
+
+
 Reusable GitHub Actions workflow templates for .NET projects, with reference example implementations.
 
 ## Reusable Workflow Templates
@@ -18,7 +21,7 @@ Restores, builds, and runs tests with optional framework matrix and Codecov uplo
 | `dotnet-version` | | `10.0.x` | SDK version (single build) |
 | `dotnet-version-matrix` | | | JSON array of `{dotnet-version, framework}` pairs for matrix builds |
 | `os` | | `ubuntu-latest` | Runner OS |
-| `codecov-slug` | | | Repo slug for Codecov upload (skipped if empty) |
+| `codecov-name` | | | Repo name for Codecov upload (skipped if empty) |
 | `codecov-flag` | | `unittests` | Codecov flag |
 
 | Secret | Required | Description |
@@ -116,7 +119,7 @@ get-version ─┬─ check-release-eligibility
 | `dotnet-version` | | `10.0.x` | SDK version for pack/publish jobs |
 | `dotnet-version-matrix` | | | JSON matrix for the build-and-test job |
 | `os` | | `ubuntu-latest` | Runner OS |
-| `codecov-slug` | | | Codecov repo slug |
+| `codecov-name` | | | Codecov repo name |
 | `codecov-flag` | | `unittests` | Codecov flag |
 | `num-github-prerelease-packages-to-keep` | | `50` | GPR cleanup retention count |
 

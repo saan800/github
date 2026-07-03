@@ -26,8 +26,8 @@ on:
         required: false
         type: string
         default: 10.0.x
-      codecov-slug:
-        description: "Slug to upload code coverage results for Codecov. e.g. saan800/saansoft-correlationId"
+      codecov-name:
+        description: "Name to upload code coverage results for Codecov. e.g. saansoft-correlationId"
         required: false
         type: string
       codecov-flag:
@@ -97,7 +97,7 @@ jobs:
             auth.docker.io:443
             builds.dotnet.microsoft.com:443
             cli.codecov.io:443
-            ingest.codecov.io:433
+            ingest.codecov.io:443
             dotnetcli.azureedge.net:443
             cognito-identity.us-east-1.amazonaws.com:443
             crl.sectigo.com:443
@@ -105,12 +105,14 @@ jobs:
             crl4.digicert.com:443
             dc.services.visualstudio.com:443
             github.com:443
+            keybase.io:443
             ocsp.digicert.com:443
             ocsp.sectigo.com:443
             pinpoint.us-east-1.amazonaws.com:443
             production.cloudflare.docker.com:443
             registry-1.docker.io:443
             s.symcb.com:443
+            storage.googleapis.com:443
             ts-crl.ws.symantec.com:443
             ts-ocsp.ws.symantec.com:443
             www.microsoft.com:443
@@ -173,7 +175,18 @@ jobs:
                 --configuration Release \
                 $FRAMEWORK_ARG \
                 --report-github \
-                /p:CollectCoverage=true
+                --coverage \
+                --coverage-output-format cobertura \
+                --results-directory ./reports/coverage/
+
+              # MTP names coverage files "<test-run-guid>.cobertura.xml", which Codecov's
+              # file auto-discovery does not recognize (it only matches exactly
+              # "cobertura.xml" or filenames containing "coverage"). Rename in place so
+              # the upload step's `directory:` search actually finds them.
+              for f in ./reports/coverage/*.cobertura.xml; do
+                [ -e "$f" ] || continue
+                mv "$f" "$(dirname "$f")/coverage.$(basename "$f")"
+              done
               ;;
             *)
               dotnet test \
@@ -187,10 +200,10 @@ jobs:
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
-        if: inputs.codecov-slug != ''
+        if: inputs.codecov-name != ''
         with:
+          fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
-          directory: ./reports/coverage/
-          fail_ci_if_error: false
+          directory: ${{ inputs.working-directory }}/reports/coverage/
           flags: ${{ inputs.codecov-flag }}, ${{ matrix.dotnet-version }}, ${{ inputs.os }}
-          slug: ${{ inputs.codecov-slug }}
+          name: ${{ inputs.codecov-name }}

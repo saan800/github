@@ -9,7 +9,10 @@
       "Bash(git diff*)",
       "Bash(git status*)",
       "Bash(git show*)",
-      "Bash(git branch*)"
+      "Bash(git branch*)",
+      "mcp__claude_ai_Microsoft_Learn__microsoft_docs_search",
+      "mcp__claude_ai_Microsoft_Learn__microsoft_docs_fetch",
+      "mcp__claude_ai_Microsoft_Learn__microsoft_code_sample_search"
     ]
   },
   "enabledPlugins": {
