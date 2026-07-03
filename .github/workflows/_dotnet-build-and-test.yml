@@ -192,7 +192,7 @@ jobs:
         with:
           fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
-          directory: ./reports/coverage/
+          directory: ${{ inputs.working-directory }}/reports/coverage/
           flags: ${{ inputs.codecov-flag }}, ${{ matrix.dotnet-version }}, ${{ inputs.os }}
           name: ${{ inputs.codecov-name }}
           verbose: true
