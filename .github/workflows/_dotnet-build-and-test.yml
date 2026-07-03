@@ -177,6 +177,15 @@ jobs:
                 --coverage \
                 --coverage-output-format cobertura \
                 --results-directory ./reports/coverage/
+
+              # MTP names coverage files "<test-run-guid>.cobertura.xml", which Codecov's
+              # file auto-discovery does not recognize (it only matches exactly
+              # "cobertura.xml" or filenames containing "coverage"). Rename in place so
+              # the upload step's `directory:` search actually finds them.
+              for f in ./reports/coverage/*.cobertura.xml; do
+                [ -e "$f" ] || continue
+                mv "$f" "$(dirname "$f")/coverage.$(basename "$f")"
+              done
               ;;
             *)
               dotnet test \
