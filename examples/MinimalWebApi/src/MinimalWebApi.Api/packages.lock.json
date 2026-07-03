@@ -11,16 +11,17 @@
           "Microsoft.OpenApi": "2.0.0"
         }
       },
+      "Microsoft.OpenApi": {
+        "type": "Direct",
+        "requested": "[2.7.5, )",
+        "resolved": "2.7.5",
+        "contentHash": "0FA67RSnRM4tcBKqiqVu/HPdZ9+QOKbmeRjxRUGTCjPU4C0bmUhd97Dso7Yild5P7nOV6GxJ2xrK0Kv/O9xp0w=="
+      },
       "Scalar.AspNetCore": {
         "type": "Direct",
-        "requested": "[2.13.15, )",
-        "resolved": "2.13.15",
-        "contentHash": "ufSBk0vdDnrhn+YLGElUdegUkM+hb7xUoySH+oaZrNHi2fAm+oeSCr60Lqmm4OeLBhPKd2htr/DANOvjuNT6rg=="
-      },
-      "Microsoft.OpenApi": {
-        "type": "Transitive",
-        "resolved": "2.0.0",
-        "contentHash": "GGYLfzV/G/ct80OZ45JxnWP7NvMX1BCugn/lX7TH5o0lcVaviavsLMTxmFV2AybXWjbi3h6FF1vgZiTK6PXndw=="
+        "requested": "[2.16.9, )",
+        "resolved": "2.16.9",
+        "contentHash": "c38OeahwryZXex0nPY9FaYt+DaM5Ayt0bEnc3ai0AQYswiOU4Rl41vbQOIIykdoaJcgUSusW+/RKmfHJKZ/lXQ=="
       }
     }
   }
